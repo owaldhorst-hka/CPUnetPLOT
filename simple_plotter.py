@@ -59,11 +59,22 @@ if __name__ == "__main__":
         header = read_header(in_file)
         print( json.dumps(header, sort_keys=True, indent=4) )  ## XXX
 
+        ## XXX
         print ("///")
         print()
 
-        for l in csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body") ):
+        ## Read as lists
+        #csv_reader = csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
+        #csv_header = next(csv_reader)
+        #print( csv_header )
+
+        ## Read as dicts
+        csv_reader = csv.DictReader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
+
+        ## print
+        for l in csv_reader:
             print( l )
+            #print( l["eth0.send"] + ", " + l["eth0.receive"] )
             pass
 
 
