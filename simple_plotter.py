@@ -36,39 +36,30 @@ if __name__ == "__main__":
     print( "CPUs: " + str(cnl_file.get_cpus()) )
     print( "NICs: " + str(cnl_file.get_nics()) )
 
-    ## Display some csv/data fields.
-    names = None
-    names = ["begin", "end", "eth0.send", "eth0.receive"]
-    print( names )
-
-    ### Prepare lists for matplotlib.
-    #x_values = list()
-    #y1_values = list()
-    #y2_values = list()
-    #for x in cnl_file.get_csv_iterator(names):
-        #x_values.extend( x[0:2] )
-
-        #append_twice( y1_values, x[2] )
-        #append_twice( y2_values, x[3] )
 
 
-    ## Prepare lists for matplotlib.
-    x_values = list()
-    y1_values = list()
-    y2_values = list()
-    for x in cnl_file.get_csv_iterator(names):
-        x_values.append( x[1] )
+    ## Prepare data for matplotlib
 
-        y1_values.append( x[2] )
-        y2_values.append( x[3] )
+    net_cols = list()
+    nic_fields = [".send", ".receive"]
+    for nic_name in cnl_file.get_nics():
+        for nic_field in nic_fields:
+            net_cols.append( nic_name + nic_field )
+
+    cpu_cols = [ cpu_name + ".util" for cpu_name in cnl_file.get_cpus() ]
+
+    cols = cnl_file.get_csv_columns()
+    x_values = cols["end"]
+    print( cols )
+
 
     ## Plot with matplotlib.
 
-    print( x_values )
-    print( y1_values )
-    print( y2_values )
+    #for col_name in net_cols:
+    for col_name in cpu_cols:
+        plt.plot(x_values , cols[col_name], label=col_name)
 
-    plt.plot(x_values, y1_values)
-    plt.plot(x_values, y2_values)
-    #plt.ylabel('some numbers')
+    ## TODO twinx: http://matplotlib.org/examples/api/two_scales.html
+
+    plt.legend()
     plt.show()
