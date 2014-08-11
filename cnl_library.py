@@ -72,11 +72,14 @@ class CNLParser:
             self.csv_index = create_csv_index(self.csv_header)
 
 
-    def get_json_header(self):
-        return self.header
-
-
     def get_csv_iterator(self, fields=None):
+        """
+        Returns an iterator to get the csv-values line by line.
+
+        @param fields [list] Only the "columns" specified in |fields| are included in the returned list (in that order).
+                      [None] All "columns" are included (order defined by |self.csv_header|.
+        """
+
         indices = None
 
         ## Only return selected columns (if the |fields| option is set).
@@ -91,15 +94,32 @@ class CNLParser:
             csv_header = next(csv_reader)
             assert( csv_header == self.csv_header )
 
+            ## TODO convert every field to float..?
+
             ## Yield line by line.
             for line in csv_reader:
                 if ( not indices ):
                     yield line
                 else:
                     yield [ line[ind] for ind in indices ]
+                    #yield [ float( line[ind] ) for ind in indices ]
+
+
+    def get_csv_columns(self, fields=None):
+        """
+        Returns a dictionary holding the CSV values grouped into columns.
+
+        Dict-keys correspond to |self.csv_header|, if |fields| is set only the specified columns are included.
+        """
+        ## TODO
+        pass
+
 
 
     ## Convenience functions ##
+
+    def get_json_header(self):
+        return self.header
 
     def print_json_header(self):
         print( json.dumps(self.header, sort_keys=True, indent=4) )
