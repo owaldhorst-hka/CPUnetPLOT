@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import sys
 from io import StringIO
 
 import json
@@ -60,7 +59,7 @@ class CNLParser:
     def __init__(self, filename):
         self.filename = filename
 
-        with open( filename ) as in_file:
+        with open( self.filename ) as in_file:
             ## Check file format version.
             assert( in_file.readline() == "%% CPUnetLOGv1\n" )
 
@@ -82,11 +81,11 @@ class CNLParser:
 
         ## Only return selected columns (if the |fields| option is set).
         if ( fields ):
-            indices = cnl_file.get_csv_indices_of(names)
+            indices = self.get_csv_indices_of(fields)
 
 
         ## Read from file.
-        with open( filename ) as in_file:
+        with open( self.filename ) as in_file:
             ## Find start of the CSV part.
             csv_reader = csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
             csv_header = next(csv_reader)
@@ -128,6 +127,7 @@ class CNLParser:
 if __name__ == "__main__":
 
     ### DEMO:
+    import sys
 
     filename = sys.argv[1]
     print( filename )
