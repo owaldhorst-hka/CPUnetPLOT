@@ -111,8 +111,33 @@ class CNLParser:
 
         Dict-keys correspond to |self.csv_header|, if |fields| is set only the specified columns are included.
         """
-        ## TODO
-        pass
+
+        ## TODO should we really use "get_..." for an I/O and computation intensive function..?
+
+        if ( fields ):
+            field_names = fields
+        else:
+            field_names = self.csv_header
+
+        num_cols = len(field_names)
+
+
+        ## Create a list for each column.
+        cols = [ list() for i in range(num_cols) ]
+
+        ## Read all csv lines and put the values in the corresponding columns,
+        for line in self.get_csv_iterator(fields):
+            for i in range(num_cols):
+                cols[i].append( line[i] )
+
+
+        ## Create output dictionary.
+        ret = dict()
+        for i in range(num_cols):
+            ret[ field_names[i] ] = cols[i]
+
+        return ret
+
 
 
 
