@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
     ## Display header informations.
     print( cnl_file.get_type() )
+    print( cnl_file.get_comment() )
 
     print( "CPUs: " + str(cnl_file.get_cpus()) )
     print( "NICs: " + str(cnl_file.get_nics()) )
@@ -63,6 +64,11 @@ if __name__ == "__main__":
     #fig, ax1 = plt.subplots()  ## twin
     fig, axes = plt.subplots(2, 1, sharex=True)
     (ax1, ax2) = axes
+
+    #plt.title( cnl_file.get_comment() )
+    plt.figtext(0.01, 0.02, "Comment: " + cnl_file.get_comment())
+    #plt.figtext(0.01, 0.99, "Hallo ;-)")
+
 
     plt.ylim(0,10**10)
     ax1.set_ylabel('Throughput (Bit/s)')

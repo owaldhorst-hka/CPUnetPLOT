@@ -179,6 +179,9 @@ class CNLParser:
     def get_type(self):
         return self.header["General"]["Type"]
 
+    def get_comment(self):
+        return self.header["General"]["Comment"]
+
     def get_cpus(self):
         return self.header["ClassDefinitions"]["CPU"]["Siblings"]
 
