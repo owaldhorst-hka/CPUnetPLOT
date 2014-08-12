@@ -7,8 +7,27 @@ import json
 import csv
 
 
-## TODO rename file / move to other file..
+## Exponential moving average
+def calc_ema(values, alpha=0.2):
+    ret = list()
+    beta = 1 - alpha
 
+    ## init
+    it = iter(values)
+    ema_value = float(next(it))
+    ret.append(ema_value)
+
+    ## loop
+    for v in it:
+        ema_value = alpha * float(v) + beta * ema_value
+        ret.append(ema_value)
+
+    return ret
+
+
+
+
+## Helper functions for CNLParser -- but they could also be handy in other contexts.
 
 def cnl_slice(file, start_delimiter, end_delimiter):
 
