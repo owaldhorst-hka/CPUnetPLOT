@@ -60,7 +60,10 @@ if __name__ == "__main__":
     # Twin plot
     #   (see http://matplotlib.org/examples/api/two_scales.html)
 
-    fig, ax1 = plt.subplots()
+    #fig, ax1 = plt.subplots()  ## twin
+    fig, axes = plt.subplots(2, 1, sharex=True)
+    (ax1, ax2) = axes
+
     plt.ylim(0,10**10)
     ax1.set_ylabel('Throughput (Bit/s)')
 
@@ -68,8 +71,9 @@ if __name__ == "__main__":
         ax1.plot(x_values , cols[col_name], label=col_name)
         ax1.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
+    ax1.legend()
 
-    ax2 = ax1.twinx()
+    #ax2 = ax1.twinx()      ## twin
     plt.ylim(0,100)
     ax2.set_ylabel('CPU util (%)')
 
@@ -77,7 +81,6 @@ if __name__ == "__main__":
         ax2.plot(x_values , cols[col_name], label=col_name)
         #ax2.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
-    ## TODO twinx:
+    ax2.legend()
 
-    plt.legend()
     plt.show()
