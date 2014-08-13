@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import sys
+import matplotlib
 import matplotlib.pyplot as plt
 
 from cnl_library import CNLParser, calc_ema
@@ -58,35 +59,40 @@ if __name__ == "__main__":
 
     ## Plot with matplotlib.
 
-    # Twin plot
-    #   (see http://matplotlib.org/examples/api/two_scales.html)
+    ## Create figure (window/file)
+    fig = plt.figure()
 
-    #fig, ax1 = plt.subplots()  ## twin
-    fig, axes = plt.subplots(2, 1, sharex=True)
-    (ax1, ax2) = axes
+    ## Draw comment on the figure.
+    t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
+    fig.texts.append(t)
 
     #plt.title( cnl_file.get_comment() )
-    plt.figtext(0.01, 0.02, "Comment: " + cnl_file.get_comment())
-    #plt.figtext(0.01, 0.99, "Hallo ;-)")
+    #plt.figtext(0.01, 0.02, "Comment: " + cnl_file.get_comment())
 
 
-    plt.ylim(0,10**10)
-    ax1.set_ylabel('Throughput (Bit/s)')
+    ax_net = fig.add_subplot(211)
+    #ax_net = fig.add_subplot(111)  ## twin
+
+
+    ax_net.set_ylim(0,10**10)
+    ax_net.set_ylabel('Throughput (Bit/s)')
 
     for col_name in net_cols:
-        ax1.plot(x_values , cols[col_name], label=col_name)
-        ax1.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
+        ax_net.plot(x_values , cols[col_name], label=col_name)
+        ax_net.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
-    ax1.legend()
+    ax_net.legend()
 
-    #ax2 = ax1.twinx()      ## twin
-    plt.ylim(0,100)
-    ax2.set_ylabel('CPU util (%)')
+
+    #ax_cpu = ax_net.twinx()      ## twin
+    ax_cpu = fig.add_subplot(212, sharex=ax_net)
+    ax_cpu.set_ylim(0,100)
+    ax_cpu.set_ylabel('CPU util (%)')
 
     for col_name in cpu_cols:
-        ax2.plot(x_values , cols[col_name], label=col_name)
+        ax_cpu.plot(x_values , cols[col_name], label=col_name)
         #ax2.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
-    ax2.legend()
+    ax_cpu.legend()
 
     plt.show()
