@@ -89,33 +89,34 @@ def plot_cpu(ax, x_values, cols, active_cols):
 ## MAIN ##
 if __name__ == "__main__":
 
-    ### DEMO:
-
-    filename = sys.argv[1]
-    print( filename )
-
-    cnl_file = parse_cnl_file(filename)
-
-    ## Plot with matplotlib.
+    num_files = len(sys.argv) - 1
 
     ## Create figure (window/file)
     fig = plt.figure()
     fig.canvas.set_window_title('CPUnetPlot')
 
-    ## Draw comment on the figure (use absolute positioning).
-    t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
-    fig.texts.append(t)
+
+    for i in range(1, num_files+1):
+        ## Read file
+        filename = sys.argv[i]
+        print( filename )
+        cnl_file = parse_cnl_file(filename)
+
+        ## Plot with matplotlib.
+
+        ## Draw comment on the figure (use absolute positioning).
+        t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
+        fig.texts.append(t)
 
 
-    ## Prepare subplots
-    ax_net = fig.add_subplot(211)
-    ax_cpu = fig.add_subplot(212, sharex=ax_net)
-    #ax_net = fig.add_subplot(111)  ## twin
-    #ax_cpu = ax_net.twinx()      ## twin
+        ## Prepare subplots
+        ax_net = fig.add_subplot(2, num_files, i)
+        ax_cpu = fig.add_subplot(2, num_files, i+num_files, sharex=ax_net)
+        #ax_net = fig.add_subplot(111)  ## twin
+        #ax_cpu = ax_net.twinx()      ## twin
 
-
-    ## Plot
-    plot_net(ax_net, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
-    plot_cpu(ax_cpu, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names )
+        ## Plot
+        plot_net(ax_net, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
+        plot_cpu(ax_cpu, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names )
 
     plt.show()
