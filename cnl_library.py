@@ -7,6 +7,22 @@ import json
 import csv
 
 
+
+def merge_lists(first, second):
+    """
+    Merges two lists alternately.
+
+    E.g.:
+
+    first = [1, 2]
+    second = ["A", "B"]
+
+    result = [1, "A", 2, "B"]
+    """
+
+    return [item for pair in zip(first, second) for item in pair]
+
+
 ## Exponential moving average
 def calc_ema(values, alpha=0.2):
     ret = list()

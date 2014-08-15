@@ -4,7 +4,7 @@
 import sys
 import matplotlib
 
-from cnl_library import CNLParser, calc_ema
+from cnl_library import CNLParser, calc_ema, merge_lists
 
 ## matplotlib.use('QT4Agg')  # override matplotlibrc
 import matplotlib.pyplot as plt
@@ -49,7 +49,7 @@ def parse_cnl_file(filename):
     cpu_cols = [ cpu_name + ".util" for cpu_name in cnl_file.get_cpus() ]
 
     cols = cnl_file.get_csv_columns()
-    x_values = cols["end"]
+    #x_values = cols["end"]
     #print( cols )   ## XXX
 
 
@@ -57,32 +57,44 @@ def parse_cnl_file(filename):
     cnl_file.cols = cols
     cnl_file.net_col_names = net_cols
     cnl_file.cpu_col_names = cpu_cols
-    cnl_file.x_values = x_values
+    #cnl_file.x_values = x_values
 
     return cnl_file
 
 
 
 
-def plot_net(ax, x_values, cols, active_cols):
+def plot(ax, x_values, cols, active_cols, **kwargs):
+    #use_ema = kwargs.get("use_ema")
+
+    for col_name in active_cols:
+        data = cols[col_name]
+        if ( len(x_values) == len(data)*2 ):
+            data = merge_lists( data, data )
+
+        # * plot *
+        ax.plot(x_values , data, label=col_name)
+
+        ## plot ema
+        #if ( use_ema ):
+            #ax.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
+
+
+def plot_net(ax, cnl_file):
     ax.set_ylim(0,10**10)
     ax.set_ylabel('Throughput (Bit/s)')
 
-    for col_name in active_cols:
-        ax.plot(x_values , cols[col_name], label=col_name)
-        #ax.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
 
     #ax.legend(loc=0)
     ax.legend(loc=8)
 
 
-def plot_cpu(ax, x_values, cols, active_cols):
+def plot_cpu(ax, cnl_file):
     ax.set_ylim(0,100)
     ax.set_ylabel('CPU util (%)')
 
-    for col_name in active_cols:
-        ax.plot(x_values , cols[col_name], label=col_name)
-        #ax2.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names)
 
     #ax.legend(loc=0)
     ax.legend(loc=1)
@@ -117,18 +129,26 @@ if __name__ == "__main__":
         ## Prepare subplots
         ax_net = fig.add_subplot(2, num_files, i, sharex=old_ax_net, sharey=old_ax_net)
         ax_cpu = fig.add_subplot(2, num_files, i+num_files, sharex=ax_net, sharey=old_ax_cpu)
-        #ax_net = fig.add_subplot(111)  ## twin
-        #ax_cpu = ax_net.twinx()      ## twin
+        #ax_net = fig.add_subplot(111)  ## twin axis
+        #ax_cpu = ax_net.twinx()        ## twin axis
+
+
+        ## Prepare x_values
+        plateau = True      ## XXX
+        if ( plateau ):
+            cnl_file.x_values = merge_lists( cnl_file.cols["begin"], cnl_file.cols["end"] )
+        else:
+            cnl_file.x_values = cnl_file.cols["end"]
 
         ## Plot
-        plot_net(ax_net, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
-        plot_cpu(ax_cpu, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names )
+        plot_net(ax_net, cnl_file)
+        plot_cpu(ax_cpu, cnl_file)
 
         old_ax_net = ax_net
         old_ax_cpu = ax_cpu
 
 
-    ## maximiza window
+    ## maximize window
     if ( num_files > 1 ):
         try:
             figManager = plt.get_current_fig_manager()
