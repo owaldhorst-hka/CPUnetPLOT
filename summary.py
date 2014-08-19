@@ -86,6 +86,7 @@ class LogAnalyzer:
         self.experiment_duration = self.experiment_end_time - self.experiment_start_time
 
 
+
     def show(self):
         print("=== Summary ===")
         #print( "Filename: " + os.path.relpath(self.cnl_file.filename) )
@@ -112,18 +113,38 @@ class LogAnalyzer:
             print( "{:<13} {:>10} {}/s".format(self.watch_fields[i]+":", speed, unit) )
 
 
+    def show_brief(self):
+        speeds = list()
+        for i in range( len(self.sums) ):
+            speed = "{:.2f}".format( round(self.sums[i] / divisor / self.experiment_duration, rounding_digits) )
+            speeds.append( "{:>8} {}/s".format(speed, unit) )
+
+        speeds_str = " ".join(speeds)
+        filename = os.path.basename(self.cnl_file.filename)
+        comments = self.cnl_file.get_comment().split(";")
+
+        print( "{:<32} {}".format( filename + ":", speeds_str) )
+        for comment in comments:
+            print( "{:<32} {}".format( "", comment.strip()) )
+
+
+
 
 ## MAIN ##
 if __name__ == "__main__":
     import sys
 
-    filename = sys.argv[1]
-    print( filename )
+    filenames = sorted( sys.argv[1:] )
 
-    ## * Parse input file. *
-    cnl_file = CNLParser(filename)
+    for filename in filenames:
+        ## * Parse input file. *
+        cnl_file = CNLParser(filename)
 
-    log = LogAnalyzer(cnl_file)
-    log.summarize()
-    log.show()
+        log = LogAnalyzer(cnl_file)
+        log.summarize()
 
+        if ( len(filenames) > 1 ):
+            log.show_brief()
+            print()
+        else:
+            log.show()
