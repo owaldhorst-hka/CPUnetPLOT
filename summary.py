@@ -5,7 +5,7 @@ import time
 import os
 
 from cnl_library import CNLParser
-
+from split_text import split_proprtionally
 
 ## some "constants"/preferences
 divisor = 1000000.0
@@ -15,6 +15,10 @@ unit = "MBits"
 
 def format_timestamp(t):
     return time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(t))
+
+def print_inverted(text, **kwargs):
+    print( "\033[7m" + text + "\033[0m", **kwargs )
+
 
 
 class LogAnalyzer:
@@ -129,6 +133,26 @@ class LogAnalyzer:
 
 
 
+    def visualize_brief(self):
+        filename = os.path.basename(self.cnl_file.filename)
+        comments = self.cnl_file.get_comment().split(";")
+
+        print( "{:<32}".format( filename + ":") )
+        for comment in comments:
+            print( comment.strip() )
+
+
+        speeds = list()
+        for i in range( len(self.sums) ):
+            speed = self.sums[i] / self.experiment_duration
+            s1 = "{:.2f}".format( round(speed / divisor, rounding_digits) )
+            text = "{:>10} {}/s".format(s1, unit)
+
+            parts = split_proprtionally(text, [speed, 1000000*10000-speed])
+            print_inverted( parts[0], end="" )
+            print( parts[1] + "|")
+
+
 
 ## MAIN ##
 if __name__ == "__main__":
@@ -144,7 +168,8 @@ if __name__ == "__main__":
         log.summarize()
 
         if ( len(filenames) > 1 ):
-            log.show_brief()
+            #log.show_brief()
+            log.visualize_brief()
             print()
         else:
             log.show()
