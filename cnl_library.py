@@ -131,13 +131,15 @@ class CNLParser:
 
             ## TODO convert every field to float..?
 
+
             ## Yield line by line.
             for line in csv_reader:
                 if ( not indices ):
-                    yield line
+                    #yield line
+                    yield [ float( v ) for v in line ]
                 else:
-                    yield [ line[ind] for ind in indices ]
-                    #yield [ float( line[ind] ) for ind in indices ]
+                    #yield [ line[ind] for ind in indices ]
+                    yield [ float( line[ind] ) for ind in indices ]
 
 
     def get_csv_columns(self, fields=None):
@@ -172,8 +174,6 @@ class CNLParser:
             ret[ field_names[i] ] = cols[i]
 
         return ret
-
-
 
 
     ## Convenience functions ##
