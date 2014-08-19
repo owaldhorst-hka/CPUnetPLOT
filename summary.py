@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-from cnl_library import CNLParser
 import time
+import os
+
+from cnl_library import CNLParser
+
 
 ## some "constants"/preferences
 divisor = 1000000.0
@@ -31,6 +34,7 @@ class LogAnalyzer:
         self.watch_indices = cnl_file.get_csv_indices_of(self.watch_fields)
         self.begin_index = cnl_file.get_csv_index_of("begin")
         self.end_index = cnl_file.get_csv_index_of("end")
+        self.duration_index = cnl_file.get_csv_index_of("duration")
 
 
         ## Result variables
@@ -51,7 +55,7 @@ class LogAnalyzer:
 
     def _sum_line(self, line):
         for i in range( len(self.sums) ):
-            self.sums[i] += line[ self.watch_indices[i] ]
+            self.sums[i] += line[ self.watch_indices[i] ] * line[self.duration_index]
 
 
 
@@ -83,22 +87,29 @@ class LogAnalyzer:
 
 
     def show(self):
-        print( "Comment: " + self.cnl_file.get_comment() )
+        print("=== Summary ===")
+        #print( "Filename: " + os.path.relpath(self.cnl_file.filename) )
+        form_str = "{:<10} {}"
+        print( form_str.format("Filename:", os.path.basename(self.cnl_file.filename)) )
+        print( form_str.format("Comment:", self.cnl_file.get_comment()) )
+        print( form_str.format("Hostname:", self.cnl_file.get_sysinfo()["hostname"]) )
+        print( form_str.format("Kernel:", self.cnl_file.get_sysinfo()["kernel"]) )
+        print()
+
+        print( form_str.format( "Start:", format_timestamp(self.experiment_start_time) ) )
+        print( form_str.format( "End:", format_timestamp(self.experiment_end_time) ) )
+        print( form_str.format( "Duration:", round(self.experiment_duration) ) )
         print()
 
         print( "CPUs: " + ", ".join(self.cnl_file.get_cpus()) )
         print( "NICs: " + ", ".join(self.cnl_file.get_nics()) )
         print()
 
-        print( "Start: {}".format( format_timestamp(self.experiment_start_time) ) )
-        print( "End:   {}".format( format_timestamp(self.experiment_end_time) ) )
-        print( "Duration: {}".format( self.experiment_duration ) )
-        print()
-
         # Show average transmission rates.
+        print("== Average transmission rates ==")
         for i in range( len(self.sums) ):
             speed = round(self.sums[i] / divisor / self.experiment_duration, rounding_digits)
-            print( "{:<13} {:>8} {}/s".format(self.watch_fields[i]+":", speed, unit) )
+            print( "{:<13} {:>10} {}/s".format(self.watch_fields[i]+":", speed, unit) )
 
 
 

@@ -204,6 +204,9 @@ class CNLParser:
     def get_nics(self):
         return self.header["ClassDefinitions"]["NIC"]["Siblings"]
 
+    def get_sysinfo(self):
+        return self.header["General"]["SystemInfo"]
+
 
 
 ## MAIN ##
