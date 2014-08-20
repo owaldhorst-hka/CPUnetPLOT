@@ -42,6 +42,9 @@ def calc_ema(values, alpha=0.2):
 
 
 
+def pretty_json(data):
+    return json.dumps(data, sort_keys=True, indent=4)
+
 
 ## Helper functions for CNLParser -- but they could also be handy in other contexts.
 

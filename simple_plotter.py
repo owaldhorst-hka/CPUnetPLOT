@@ -4,7 +4,7 @@
 import sys
 import matplotlib
 
-from cnl_library import CNLParser, calc_ema, merge_lists
+from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json
 
 ## matplotlib.use('QT4Agg')  # override matplotlibrc
 import matplotlib.pyplot as plt
@@ -26,15 +26,6 @@ def append_twice(base_list, extend_list):
 def parse_cnl_file(filename):
     ## * Parse input file. *
     cnl_file = CNLParser(filename)
-
-
-    ## Display header informations.
-    print( cnl_file.get_type() )
-    print( cnl_file.get_comment() )
-
-    print( "CPUs: " + str(cnl_file.get_cpus()) )
-    print( "NICs: " + str(cnl_file.get_nics()) )
-
 
     ## Prepare data for matplotlib
 
@@ -116,8 +107,11 @@ if __name__ == "__main__":
     for i in range(1, num_files+1):
         ## Read file
         filename = sys.argv[i]
-        print( filename )
         cnl_file = parse_cnl_file(filename)
+
+        print( filename )
+        print( pretty_json(cnl_file.get_general_header()) )
+        print()
 
         ## Plot with matplotlib.
 
