@@ -86,8 +86,8 @@ def plot_net(ax, cnl_file):
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
 
-    #ax.legend(loc=0)
-    ax.legend(loc=8)
+    ax.legend(loc=0)
+    #ax.legend(loc=8)
 
 
 def plot_cpu(ax, cnl_file):
@@ -96,8 +96,8 @@ def plot_cpu(ax, cnl_file):
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names)
 
-    #ax.legend(loc=0)
-    ax.legend(loc=1)
+    ax.legend(loc=0)
+    #ax.legend(loc=1)
 
 
 
