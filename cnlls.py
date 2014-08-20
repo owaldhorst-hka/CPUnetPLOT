@@ -33,12 +33,56 @@ def find_match(cnl_file, list_of_files):
     return None
 
 
+
+def merge_comments(left_file, right_file):
+    if ( not right_file ):
+        return left_file.get_comment()
+
+    c1 = left_file.get_comment()
+    c2 = right_file.get_comment()
+
+    if ( c1.find(c2) >= 0 ):
+        return c1
+
+    if ( c2.find(c1) >= 0 ):
+        return c2
+
+    return c1 + " / " + c2
+
+
+
+def print_line(left_file, right_file, long=False):
+    out = ""
+
+    if ( right_file ):
+        out = "{}  {}".format(left_file.filename, right_file.filename)
+    else:
+        out = left_file.filename
+
+    if ( long ):
+        out += "   // " + merge_comments(left_file, right_file)
+
+    print( out )
+
+
+
 ## MAIN ##
 if __name__ == "__main__":
-    import sys
+    #import sys
 
-    if ( len(sys.argv) > 1 ):
-        filenames = sorted( sys.argv[1:] )
+    ## Command line arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("files", nargs='*')
+    parser.add_argument("-l", "--long", action="store_true")
+
+    args = parser.parse_args()
+
+
+    if ( args.files ):
+        filenames = sorted( args.files )
     else:
         filenames = list_files_in_cur_dir()
 
@@ -61,18 +105,14 @@ if __name__ == "__main__":
 
     for left_file in left_files:
         matching_file = find_match(left_file, right_files)
-
-        if ( matching_file ):
-            print( "{}  {}".format(left_file.filename, matching_file.filename) )
-        else:
-            print( left_file.filename )
+        print_line(left_file, matching_file, args.long)
 
 
     ## Print left over right files.
     if ( len(right_files) > 0 ):
         print()
         for f in right_files:
-            print( f.filename )
+            print_line(f, None, args.long)
 
 
     ## Print files with different hostnames
@@ -82,7 +122,7 @@ if __name__ == "__main__":
 
         for h in hostnames[2:]:
             for f in cnl_files[h]:
-                print( f.filename )
+                print_line(f, None, args.long)
 
 
 
