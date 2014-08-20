@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-from cnl_library import CNLParser
+import os
 
+from cnl_library import CNLParser
 from collections import defaultdict, deque
+
+
+def list_files_in_cur_dir():
+    raw_list = os.listdir()
+    no_invisible = filter(lambda filename: not filename.startswith("."), raw_list)
+
+    return sorted( no_invisible )
 
 
 def get_begin(cnl_file):
@@ -29,7 +37,14 @@ def find_match(cnl_file, list_of_files):
 if __name__ == "__main__":
     import sys
 
-    filenames = sorted( sys.argv[1:] )
+    if ( len(sys.argv) > 1 ):
+        filenames = sorted( sys.argv[1:] )
+    else:
+        filenames = list_files_in_cur_dir()
+
+
+
+
     cnl_files = defaultdict(deque)
 
     ## Parse files and store them in a dict (of lists) according to their hostname.
