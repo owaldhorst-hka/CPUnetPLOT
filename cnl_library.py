@@ -192,6 +192,9 @@ class CNLParser:
 
     # Specific getters:
 
+    def get_general_header(self):
+        return self.header["General"]
+
     def get_type(self):
         return self.header["General"]["Type"]
 
@@ -206,6 +209,9 @@ class CNLParser:
 
     def get_sysinfo(self):
         return self.header["General"]["SystemInfo"]
+
+    def get_hostname(self):
+        return self.get_sysinfo()["hostname"]
 
 
 
