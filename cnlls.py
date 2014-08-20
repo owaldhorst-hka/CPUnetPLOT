@@ -60,7 +60,14 @@ def print_line(left_file, right_file, long=False):
         out = left_file.filename
 
     if ( long ):
-        out += "   // " + merge_comments(left_file, right_file)
+        out += "   // "
+        comm_offset = len(out)
+
+        comments = merge_comments(left_file, right_file).split(";")
+        out += comments[0]
+
+        for c in comments[1:]:
+            out += ";\n" + " "*comm_offset + c.strip()
 
     print( out )
 
