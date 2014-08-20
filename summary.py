@@ -3,6 +3,7 @@
 
 import time
 import os
+from itertools import zip_longest
 
 from cnl_library import CNLParser
 from split_text import split_proprtionally
@@ -16,8 +17,21 @@ unit = "MBits"
 def format_timestamp(t):
     return time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(t))
 
+
+def sprint_bold(text):
+    return "\033[1m" + text + "\033[0m"
+
+def sprint_inverted(text):
+    return "\033[7m" + text + "\033[0m"
+
 def print_inverted(text, **kwargs):
-    print( "\033[7m" + text + "\033[0m", **kwargs )
+    #print( "\033[7m" + text + "\033[0m", **kwargs )
+    print( sprint_inverted(text), **kwargs )
+
+
+def print_in_two_columns(format_str, left_col, right_col):
+    for l, r in zip_longest(left_col, right_col, fillvalue=""):
+        print( format_str.format(l, r) )
 
 
 
@@ -137,20 +151,32 @@ class LogAnalyzer:
         filename = os.path.basename(self.cnl_file.filename)
         comments = self.cnl_file.get_comment().split(";")
 
-        print( "{:<32}".format( filename + ":") )
+        left_col = list()
+        right_col = list()
+
+        #left_col.append( sprint_bold(filename + ":") )
+        left_col.append( filename + ":" )
         for comment in comments:
-            print( comment.strip() )
+            left_col.append(comment.strip()[:48])
 
 
         speeds = list()
         for i in range( len(self.sums) ):
             speed = self.sums[i] / self.experiment_duration
-            s1 = "{:.2f}".format( round(speed / divisor, rounding_digits) )
-            text = "{:>10} {}/s".format(s1, unit)
 
-            parts = split_proprtionally(text, [speed, 1000000*10000-speed])
-            print_inverted( parts[0], end="" )
-            print( parts[1] + "|")
+            number_str = "{:.2f}".format( round(speed / divisor, rounding_digits) )
+            #text = "{:>10} {}/s".format(s1, unit)
+            bar_str = "{:<20}".format(number_str + " " + unit + "/s")
+
+            label = "{:<6}".format( self.nics[int(i/2)] + ":" if i%2==0 else "" )
+
+            parts = split_proprtionally(bar_str, [speed, 1000000*10000-speed])
+            text = label + "|" + sprint_inverted(parts[0]) + parts[1] + "|"
+
+            right_col.append( text )
+
+
+        print_in_two_columns("{:<50} {}", left_col, right_col )
 
 
 
