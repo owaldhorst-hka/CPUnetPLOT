@@ -75,5 +75,16 @@ if __name__ == "__main__":
             print( f.filename )
 
 
+    ## Print files with different hostnames
+    #    Note: This is not the intended usecase!
+    if ( len(hostnames) > 2 ):
+        print()
+
+        for h in hostnames[2:]:
+            for f in cnl_files[h]:
+                print( f.filename )
+
+
+
 
 
