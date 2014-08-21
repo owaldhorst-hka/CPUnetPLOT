@@ -5,7 +5,7 @@ import time
 import os
 from itertools import zip_longest
 
-from cnl_library import CNLParser
+from cnl_library import CNLParser, pretty_json
 from split_text import split_proprtionally
 
 ## some "constants"/preferences
@@ -35,7 +35,7 @@ def print_in_two_columns(format_str, left_col, right_col):
 
 
 
-def show_match(left_file, right_file):
+def show_match(left_file, right_file, env=None):
     """
     Displays a brief summary of two CNL-file next to each other.
 
@@ -43,8 +43,8 @@ def show_match(left_file, right_file):
     (e.g. sender and receiver).
     """
 
-    left_head, left_rates = left_file.as_column()
-    right_head, right_rates = right_file.as_column()
+    left_head, left_rates = left_file.as_column(env)
+    right_head, right_rates = right_file.as_column(env)
 
     ## Head
     print_in_two_columns("{:<50} {}", left_head, right_head)
@@ -173,7 +173,7 @@ class LogAnalyzer:
 
 
 
-    def as_column(self):
+    def as_column(self, env=None):
         ## TODO change name?
 
         ## Head
@@ -186,6 +186,14 @@ class LogAnalyzer:
         head.append( filename )
         for comment in comments:
             head.append(comment.strip()[:48])
+
+        if ( env ):
+            env_head = self.cnl_file.get_environment()
+            for e in env:
+                head.append( '{}: {}'.format(e, pretty_json(env_head[e])) )
+
+
+        head.append("Duration: {}s".format(round(self.experiment_duration)) )
 
 
         ## Transmission rates
@@ -208,8 +216,8 @@ class LogAnalyzer:
 
 
 
-    def visualize_brief(self):
-        head, rates = self.as_column()
+    def visualize_brief(self, env=None):
+        head, rates = self.as_column(env)
 
         print_in_two_columns("{:<50} {}", head, rates )
 

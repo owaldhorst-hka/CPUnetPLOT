@@ -77,14 +77,14 @@ def show_summary(left_file, right_file=None):
     ## BRANCH: No match -> fallback to show_brief()
     if ( not right_file ):
         log = LogAnalyzer(left_file)
-        log.visualize_brief()
+        log.visualize_brief(args.environment)
 
     ## BRANCH: Match -> Display both next to each other.
     else:
         log_left = LogAnalyzer(left_file)
         log_right = LogAnalyzer(right_file)
 
-        show_match(log_left, log_right)
+        show_match(log_left, log_right, args.environment)
 
 
 def show(left_file, right_file, long=False, summary=False):
@@ -107,9 +107,8 @@ if __name__ == "__main__":
     parser.add_argument("files", nargs='*')
     parser.add_argument("-l", "--long", action="store_true")
     parser.add_argument("-s", "--summary", action="store_true")
-
-    ## TODO -e, --environment
-    #   Specify which env-fields should be added to the comment
+    parser.add_argument("-e", "--environment", action='append', metavar="ENV",
+                        help="Environment variable that should be displayed. (May be set multiple times.)")
 
     args = parser.parse_args()
 

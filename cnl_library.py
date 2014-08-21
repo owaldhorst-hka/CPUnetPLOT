@@ -216,6 +216,9 @@ class CNLParser:
     def get_hostname(self):
         return self.get_sysinfo()["hostname"]
 
+    def get_environment(self):
+        return self.header["General"]["Environment"]
+
 
 
 ## MAIN ##
