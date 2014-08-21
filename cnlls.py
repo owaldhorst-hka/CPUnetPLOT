@@ -2,9 +2,10 @@
 # -*- coding:utf-8 -*-
 
 import os
+from collections import defaultdict, deque
 
 from cnl_library import CNLParser
-from collections import defaultdict, deque
+from summary import LogAnalyzer, show_match
 
 
 def list_files_in_cur_dir():
@@ -51,7 +52,7 @@ def merge_comments(left_file, right_file):
 
 
 
-def print_line(left_file, right_file, long=False):
+def print_line(left_file, right_file, long):
     out = ""
 
     if ( right_file ):
@@ -72,6 +73,27 @@ def print_line(left_file, right_file, long=False):
     print( out )
 
 
+def show_summary(left_file, right_file=None):
+    ## BRANCH: No match -> fallback to show_brief()
+    if ( not right_file ):
+        log = LogAnalyzer(left_file)
+        log.summarize()
+        log.show_brief()
+
+    ## BRANCH: Match -> Display both next to each other.
+    else:
+        log_left = LogAnalyzer(left_file)
+        log_right = LogAnalyzer(right_file)
+
+        show_match(log_left, log_right)
+
+
+def show(left_file, right_file, long=False, summary=False):
+    if ( summary ):
+        show_summary(left_file, right_file)
+    else:
+        print_line(left_file, right_file, long)
+
 
 ## MAIN ##
 if __name__ == "__main__":
@@ -84,6 +106,7 @@ if __name__ == "__main__":
 
     parser.add_argument("files", nargs='*')
     parser.add_argument("-l", "--long", action="store_true")
+    parser.add_argument("-s", "--summary", action="store_true")
 
     args = parser.parse_args()
 
@@ -112,14 +135,14 @@ if __name__ == "__main__":
 
     for left_file in left_files:
         matching_file = find_match(left_file, right_files)
-        print_line(left_file, matching_file, args.long)
+        show(left_file, matching_file, args.long, args.summary)
 
 
     ## Print left over right files.
     if ( len(right_files) > 0 ):
         print()
         for f in right_files:
-            print_line(f, None, args.long)
+            show(f, None, args.long, args.summary)
 
 
     ## Print files with different hostnames
@@ -129,8 +152,7 @@ if __name__ == "__main__":
 
         for h in hostnames[2:]:
             for f in cnl_files[h]:
-                print_line(f, None, args.long)
-
+                show(f, None, args.long, args.summary)
 
 
 
