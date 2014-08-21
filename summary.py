@@ -54,7 +54,6 @@ def show_match(left_file, right_file):
     #  Note: The escape sequence for the "rate-bar" is counted as characters.. :-/
 
     print()
-    print()
 
 
 

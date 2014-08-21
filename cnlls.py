@@ -77,8 +77,7 @@ def show_summary(left_file, right_file=None):
     ## BRANCH: No match -> fallback to show_brief()
     if ( not right_file ):
         log = LogAnalyzer(left_file)
-        log.summarize()
-        log.show_brief()
+        log.visualize_brief()
 
     ## BRANCH: Match -> Display both next to each other.
     else:
@@ -91,6 +90,7 @@ def show_summary(left_file, right_file=None):
 def show(left_file, right_file, long=False, summary=False):
     if ( summary ):
         show_summary(left_file, right_file)
+        print()
     else:
         print_line(left_file, right_file, long)
 
@@ -128,32 +128,30 @@ if __name__ == "__main__":
         cnl_files[hostname].append( cnl_file )
 
 
-    ## Match.
     hostnames = sorted( cnl_files.keys() )
-    left_files = cnl_files[hostnames[0]]
-    right_files = cnl_files[hostnames[1]]
 
-    for left_file in left_files:
-        matching_file = find_match(left_file, right_files)
-        show(left_file, matching_file, args.long, args.summary)
+    ## BRANCH: Input from two hosts -> Matching.
+    if ( len(hostnames) == 2 ):
+        left_files = cnl_files[hostnames[0]]
+        right_files = cnl_files[hostnames[1]]
 
-
-    ## Print left over right files.
-    if ( len(right_files) > 0 ):
-        print()
-        for f in right_files:
-            show(f, None, args.long, args.summary)
+        for left_file in left_files:
+            matching_file = find_match(left_file, right_files)
+            show(left_file, matching_file, args.long, args.summary)
 
 
-    ## Print files with different hostnames
-    #    Note: This is not the intended usecase!
-    if ( len(hostnames) > 2 ):
-        print()
-
-        for h in hostnames[2:]:
-            for f in cnl_files[h]:
+        ## Print left over right files.
+        if ( len(right_files) > 0 ):
+            print()
+            for f in right_files:
                 show(f, None, args.long, args.summary)
 
+
+    ## BRANCH: Only one (or more than two hosts) -> No matching.
+    else:
+        for h in hostnames:
+            for f in cnl_files[h]:
+                show(f, None, args.long, args.summary)
 
 
 
