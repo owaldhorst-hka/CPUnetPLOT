@@ -108,6 +108,9 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--long", action="store_true")
     parser.add_argument("-s", "--summary", action="store_true")
 
+    ## TODO -e, --environment
+    #   Specify which env-fields should be added to the comment
+
     args = parser.parse_args()
 
 
