@@ -17,6 +17,22 @@ unit = "MBits"
 def format_timestamp(t):
     return time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(t))
 
+def human_readable_from_seconds(seconds):
+    if ( seconds <= 5 ):
+        return "{:.2}s".format(seconds)
+
+    elif ( seconds <= 2*60 ):
+        return "{}s".format(round(seconds))
+
+    elif ( seconds <= 5*60 ):
+        return "{}min {}s".format(round(seconds/60), round(seconds%60))
+
+    elif ( seconds <= 2*60*60 ):
+        return "{}min".format(round(seconds/60), round(seconds%60))
+
+    else:
+        return "{}h {}min".format(round(seconds/3600), round( (seconds/60)%60) )
+
 
 def sprint_bold(text):
     return "\033[1m" + text + "\033[0m"
@@ -193,7 +209,7 @@ class LogAnalyzer:
                 head.append( '{}: {}'.format(e, pretty_json(env_head[e])) )
 
 
-        head.append("Duration: {}s".format(round(self.experiment_duration)) )
+        head.append( "Duration: {}".format(human_readable_from_seconds(self.experiment_duration)) )
 
 
         ## Transmission rates
