@@ -199,10 +199,17 @@ class LogAnalyzer:
         filename = os.path.basename(self.cnl_file.filename)
         comments = self.cnl_file.get_comment().split(";")
 
+        # file name
         head.append( filename )
+
+        # comment(s)
         for comment in comments:
             head.append(comment.strip()[:48])
 
+        # duration
+        head.append( "Duration: {}".format(human_readable_from_seconds(self.experiment_duration)) )
+
+        # requested environment variables
         if ( env ):
             env_head = self.cnl_file.get_environment()
             for e in env:
@@ -218,8 +225,6 @@ class LogAnalyzer:
                     for line in it:
                         head.append( line )
 
-
-        head.append( "Duration: {}".format(human_readable_from_seconds(self.experiment_duration)) )
 
 
         ## Transmission rates
