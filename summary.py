@@ -206,7 +206,17 @@ class LogAnalyzer:
         if ( env ):
             env_head = self.cnl_file.get_environment()
             for e in env:
-                head.append( '{}: {}'.format(e, pretty_json(env_head[e])) )
+                json = env_head.get(e)
+                if ( json ):
+                    text = pretty_json(json)
+                    it = iter(text.split("\n"))
+
+                    # first line
+                    head.append( '{}: {}'.format(e, next(it)) )
+
+                    # subsequent lines (if any)
+                    for line in it:
+                        head.append( line )
 
 
         head.append( "Duration: {}".format(human_readable_from_seconds(self.experiment_duration)) )
