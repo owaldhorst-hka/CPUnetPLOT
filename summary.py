@@ -101,6 +101,7 @@ class LogAnalyzer:
         self.recording_end_time = None
 
         self.sums = [0.0] * len(self.watch_fields)
+        self.pause_time = 0
 
         ## Trigger "summarize"
         self._summarize()
@@ -114,8 +115,13 @@ class LogAnalyzer:
         return False
 
     def _sum_line(self, line):
+        # Summarize the values of all watched fields (data send/received).
         for i in range( len(self.sums) ):
             self.sums[i] += line[ self.watch_indices[i] ] * line[self.duration_index]
+
+        # Also, keep track of all intervals in which noting happened (on the NICs).
+        if ( sum([line[i] for i in self.watch_indices]) == 0):
+            self.pause_time += line[self.duration_index]
 
 
 
@@ -207,7 +213,10 @@ class LogAnalyzer:
             head.append(comment.strip()[:48])
 
         # duration
-        head.append( "Duration: {}".format(human_readable_from_seconds(self.experiment_duration)) )
+        pause = ""
+        if ( self.pause_time > 5 ):
+            pause = "({} of that idle)".format( human_readable_from_seconds(self.pause_time) )
+        head.append( "Duration: {} {}".format(human_readable_from_seconds(self.experiment_duration), pause) )
 
         # requested environment variables
         if ( env ):
@@ -231,7 +240,7 @@ class LogAnalyzer:
 
         rates = list()
         for i in range( len(self.sums) ):
-            speed = self.sums[i] / self.experiment_duration
+            speed = self.sums[i] / (self.experiment_duration-self.pause_time)
 
             number_str = "{:.2f}".format( round(speed / divisor, rounding_digits) )
             bar_str = "{:<20}".format(number_str + " " + unit + "/s")
