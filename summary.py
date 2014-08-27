@@ -119,11 +119,6 @@ class LogAnalyzer:
         for i in range( len(self.sums) ):
             self.sums[i] += line[ self.watch_indices[i] ] * line[self.duration_index]
 
-        # Also, keep track of all intervals in which noting happened (on the NICs).
-        if ( sum([line[i] for i in self.watch_indices]) == 0):
-            self.pause_time += line[self.duration_index]
-
-
 
     def _get_begin(self, line):
         return line[self.begin_index]
@@ -133,9 +128,13 @@ class LogAnalyzer:
 
 
     def _summarize(self):
+        probably_pause_time = 0
 
         for line in self.cnl_file.get_csv_iterator():
-            ## on active samples
+            ## Sum watched columns.
+            self._sum_line(line)
+
+            ## Find experiment start and end time.
             if ( self._is_activity(line) ):
 
                 # Find begin of the experiment.
@@ -145,8 +144,15 @@ class LogAnalyzer:
                 # Find end of the experiment.
                 self.experiment_end_time = self._get_end(line)
 
-            ## Sum watched columns.
-            self._sum_line(line)
+                # Since the experiment apparently has started and not finished yet,
+                #   the last observed idle time was actually during the experiment.
+                #   --> So, track it.
+                self.pause_time += probably_pause_time
+                probably_pause_time = 0
+
+            ## Keep track of idle states during the experiment.
+            else:
+                probably_pause_time += line[self.duration_index]
 
 
         self.experiment_duration = self.experiment_end_time - self.experiment_start_time
