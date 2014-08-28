@@ -214,7 +214,10 @@ class CNLParser:
         return self.header["General"]["SystemInfo"]
 
     def get_hostname(self):
-        return self.get_sysinfo()["hostname"]
+        try:
+            return self.get_sysinfo()["hostname"]
+        except KeyError:
+            return "(unknown)"
 
     def get_environment(self):
         return self.header["General"]["Environment"]

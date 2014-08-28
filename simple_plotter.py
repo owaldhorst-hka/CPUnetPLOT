@@ -5,6 +5,8 @@ import sys
 import matplotlib
 
 from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json
+from plot_cpu import plot_top_cpus
+
 
 ## matplotlib.use('QT4Agg')  # override matplotlibrc
 import matplotlib.pyplot as plt
@@ -38,6 +40,7 @@ def parse_cnl_file(filename):
             net_cols.append( nic_name + nic_field )
 
     cpu_cols = [ cpu_name + ".util" for cpu_name in cnl_file.get_cpus() ]
+    #cpu_cols = [ cpu_name + ".irq" for cpu_name in cnl_file.get_cpus() ]   ## XXX
 
     cols = cnl_file.get_csv_columns()
     #x_values = cols["end"]
@@ -71,25 +74,44 @@ def plot(ax, x_values, cols, active_cols, **kwargs):
             #ax.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
 
-def plot_net(ax, cnl_file):
+def plot_net(ax, cnl_file, legend_outside=True):
     ax.set_ylim(0,10**10)
     ax.set_ylabel('Throughput (Bit/s)')
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
 
-    ax.legend(loc=0)
-    #ax.legend(loc=8)
+    # Legend
+    if ( legend_outside ):
+        offset = matplotlib.transforms.ScaledTranslation(0, -20, matplotlib.transforms.IdentityTransform())
+        trans = ax.transAxes + offset
+
+        l = ax.legend( loc='upper left', bbox_to_anchor=(0, 0), ncol=int(len(cnl_file.net_col_names)/2),
+                      bbox_transform = trans,
+                      fancybox=False, shadow=False)
+    else:
+        l = ax.legend(loc=0)
 
 
-def plot_cpu(ax, cnl_file):
+def plot_cpu(ax, cnl_file, legend_outside=True):
     ax.set_ylim(0,100)
     ax.set_ylabel('CPU util (%)')
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names)
 
-    ax.legend(loc=0)
-    #ax.legend(loc=1)
+    # Legend
+    if ( legend_outside ):
+        offset = matplotlib.transforms.ScaledTranslation(0, -20, matplotlib.transforms.IdentityTransform())
+        trans = ax.transAxes + offset
 
+        l = ax.legend( loc='upper left', bbox_to_anchor=(0, 0), ncol=int(len(cnl_file.cpu_col_names)/2),
+                      bbox_transform = trans,
+                      fancybox=False, shadow=False)
+    else:
+        l = ax.legend(loc=0)
+
+    ax.set_label("Testlabel")
+
+    l.draggable(True)
 
 
 
@@ -101,6 +123,8 @@ if __name__ == "__main__":
     ## Create figure (window/file)
     fig = plt.figure()
     fig.canvas.set_window_title('CPUnetPlot')
+
+    num_cols = 2
 
     old_ax_net = None
     old_ax_cpu = None
@@ -121,8 +145,9 @@ if __name__ == "__main__":
 
 
         ## Prepare subplots
-        ax_net = fig.add_subplot(2, num_files, i, sharex=old_ax_net, sharey=old_ax_net)
-        ax_cpu = fig.add_subplot(2, num_files, i+num_files, sharex=ax_net, sharey=old_ax_cpu)
+        fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
+        ax_net = fig.add_subplot(2, num_cols, i, sharex=old_ax_net, sharey=old_ax_net)
+        ax_cpu = fig.add_subplot(2, num_cols, i+num_cols, sharex=ax_net, sharey=old_ax_cpu)
         #ax_net = fig.add_subplot(111)  ## twin axis
         #ax_cpu = ax_net.twinx()        ## twin axis
 
@@ -142,8 +167,17 @@ if __name__ == "__main__":
         old_ax_cpu = ax_cpu
 
 
+    ## If we have only one input file, plot CPU area charts.
+    if ( num_files == 1 ):
+        ax1 = fig.add_subplot(2, num_cols, 2, sharex=old_ax_net, sharey=old_ax_cpu)
+        ax2 = fig.add_subplot(2, num_cols, 4, sharex=ax_net, sharey=old_ax_cpu)
+
+        plot_top_cpus( cnl_file, (ax1, ax2), (0,1) )
+
+
+
     ## maximize window
-    if ( num_files > 1 ):
+    if ( num_files > 1 or True ):  ## XXX always maximize?
         try:
             figManager = plt.get_current_fig_manager()
             figManager.window.showMaximized()
