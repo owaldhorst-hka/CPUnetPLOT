@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from operator import itemgetter
+from matplotlib import transforms
 import numpy
 import copy
 
@@ -108,7 +109,10 @@ def plot_area_chart(ax, cnl_file, cols, legend_outside=True, legend_title=None):
 
     # Legend
     if ( legend_outside ):
-        l = ax.legend(bbox_to_anchor=(1.2, 1.02),fancybox=True, shadow=True, title=legend_title)
+        offset = transforms.ScaledTranslation(20, 0, transforms.IdentityTransform())
+        trans = ax.transAxes + offset
+
+        l = ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.02),fancybox=True, shadow=True, title=legend_title)
     else:
         l = ax.legend(loc=0)
 
