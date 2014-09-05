@@ -67,7 +67,7 @@ def plot(ax, x_values, cols, active_cols, **kwargs):
             data = merge_lists( data, data )
 
         # * plot *
-        ax.plot(x_values , data, label=col_name)
+        ax.plot(x_values , data, label=col_name, alpha=0.7)  ## XXX TESTING
 
         ## plot ema
         #if ( use_ema ):
@@ -118,7 +118,22 @@ def plot_cpu(ax, cnl_file, legend_outside=True):
 ## MAIN ##
 if __name__ == "__main__":
 
-    num_files = len(sys.argv) - 1
+    ## Command line arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("files", nargs='*')
+    parser.add_argument("-tn", "--transparent-net", action="store_true")    ## TODO
+    parser.add_argument("-tc", "--transparent-cpu", action="store_true")    ## TODO
+    parser.add_argument("-nc", "--no-comment", action="store_true")         ## TODO
+    parser.add_argument("-p", "--publication", action="store_true",         ## TODO
+                        help="Reduces the margins so that the output is more suitable for publications and presentations. (Implies --no-comment)")
+
+    args = parser.parse_args()
+
+
+    num_files = len(args.files)
 
     ## Create figure (window/file)
     fig = plt.figure()
@@ -128,9 +143,9 @@ if __name__ == "__main__":
 
     old_ax_net = None
     old_ax_cpu = None
-    for i in range(1, num_files+1):
+    for i in range(0, num_files):
         ## Read file
-        filename = sys.argv[i]
+        filename = args.files[i]
         cnl_file = parse_cnl_file(filename)
 
         print( filename )
@@ -146,8 +161,8 @@ if __name__ == "__main__":
 
         ## Prepare subplots
         fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
-        ax_net = fig.add_subplot(2, num_cols, i, sharex=old_ax_net, sharey=old_ax_net)
-        ax_cpu = fig.add_subplot(2, num_cols, i+num_cols, sharex=ax_net, sharey=old_ax_cpu)
+        ax_net = fig.add_subplot(2, num_cols, i+1, sharex=old_ax_net, sharey=old_ax_net)
+        ax_cpu = fig.add_subplot(2, num_cols, i+num_cols+1, sharex=ax_net, sharey=old_ax_cpu)
         #ax_net = fig.add_subplot(111)  ## twin axis
         #ax_cpu = ax_net.twinx()        ## twin axis
 
