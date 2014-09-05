@@ -125,7 +125,12 @@ if __name__ == "__main__":
 
     ## Parse files and store them in a dict (of lists) according to their hostname.
     for filename in filenames:
-        cnl_file = CNLParser(filename)
+        try:
+            cnl_file = CNLParser(filename)
+        except CNLParser.WrongFileFormat_Exception:
+            print( "Skipping: {}".format(filename) )
+            continue
+
         hostname = cnl_file.get_hostname()
         cnl_files[hostname].append( cnl_file )
 

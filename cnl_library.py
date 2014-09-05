@@ -92,14 +92,18 @@ def read_header(f):
     return header
 
 
-
 class CNLParser:
+    class WrongFileFormat_Exception(Exception):
+        pass
+
+
     def __init__(self, filename):
         self.filename = filename
 
         with open( self.filename ) as in_file:
             ## Check file format version.
-            assert( in_file.readline() == "%% CPUnetLOGv1\n" )
+            if ( not in_file.readline() == "%% CPUnetLOGv1\n" ):
+                raise self.WrongFileFormat_Exception()
 
             ## Read JSON header.
             self.header = read_header(in_file)
