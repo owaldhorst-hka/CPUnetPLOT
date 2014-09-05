@@ -58,7 +58,7 @@ def parse_cnl_file(filename):
 
 
 
-def plot(ax, x_values, cols, active_cols, **kwargs):
+def plot(ax, x_values, cols, active_cols, alpha, **kwargs):
     #use_ema = kwargs.get("use_ema")
 
     for col_name in active_cols:
@@ -67,18 +67,18 @@ def plot(ax, x_values, cols, active_cols, **kwargs):
             data = merge_lists( data, data )
 
         # * plot *
-        ax.plot(x_values , data, label=col_name, alpha=0.7)  ## XXX TESTING
+        ax.plot(x_values , data, label=col_name, alpha=alpha)
 
         ## plot ema
         #if ( use_ema ):
             #ax.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
 
 
-def plot_net(ax, cnl_file, legend_outside=True):
+def plot_net(ax, cnl_file, alpha, legend_outside=True):
     ax.set_ylim(0,10**10)
     ax.set_ylabel('Throughput (Bit/s)')
 
-    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names)
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, alpha)
 
     # Legend
     if ( legend_outside ):
@@ -92,11 +92,11 @@ def plot_net(ax, cnl_file, legend_outside=True):
         l = ax.legend(loc=0)
 
 
-def plot_cpu(ax, cnl_file, legend_outside=True):
+def plot_cpu(ax, cnl_file, alpha, legend_outside=True):
     ax.set_ylim(0,100)
     ax.set_ylabel('CPU util (%)')
 
-    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names)
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names, alpha)
 
     # Legend
     if ( legend_outside ):
@@ -124,10 +124,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("files", nargs='*')
-    parser.add_argument("-tn", "--transparent-net", action="store_true")    ## TODO
-    parser.add_argument("-tc", "--transparent-cpu", action="store_true")    ## TODO
-    parser.add_argument("-nc", "--no-comment", action="store_true")         ## TODO
-    parser.add_argument("-p", "--publication", action="store_true",         ## TODO
+    parser.add_argument("-tn", "--transparent-net", action="store_true")
+    parser.add_argument("-tc", "--transparent-cpu", action="store_true")
+    parser.add_argument("-t", "--transparent", action="store_true",
+                        help="Implies --transparent-net and --transparent-cpu")    ## TODO
+    parser.add_argument("--opacity", type=float, default=0.7,
+                        help="Default: 0.7")
+    parser.add_argument("-nc", "--no-comment", action="store_true")                ## TODO
+    parser.add_argument("-p", "--publication", action="store_true",                ## TODO
                         help="Reduces the margins so that the output is more suitable for publications and presentations. (Implies --no-comment)")
 
     args = parser.parse_args()
@@ -175,8 +179,8 @@ if __name__ == "__main__":
             cnl_file.x_values = cnl_file.cols["end"]
 
         ## Plot
-        plot_net(ax_net, cnl_file)
-        plot_cpu(ax_cpu, cnl_file)
+        plot_net(ax_net, cnl_file, args.opacity if args.transparent_net else 1.0)
+        plot_cpu(ax_cpu, cnl_file, args.opacity if args.transparent_cpu else 1.0)
 
         old_ax_net = ax_net
         old_ax_cpu = ax_cpu
