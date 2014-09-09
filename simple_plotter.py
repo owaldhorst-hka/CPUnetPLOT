@@ -153,6 +153,11 @@ if __name__ == "__main__":
                         metavar="ALPHA",
                         help = "Smooth CPU values with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
 
+    ## TODO implement (maybe set as default)
+    parser.add_argument("-a", "--all-matches", action="store_true",
+                        help="Finds all matches current directory (or in --files, if specified) and plots them pairwise.")
+
+
     args = parser.parse_args()
 
 
