@@ -248,6 +248,13 @@ if __name__ == "__main__":
 
 
 
+    ## Set the default format for the save-botton to PDF.
+    try:
+        fig.canvas.get_default_filetype = lambda: "pdf"
+        fig.canvas.get_default_filename = lambda: "cpunetlog.pdf"   ## TODO
+    except:
+        pass
+
     ## maximize window
     try:
         figManager = plt.get_current_fig_manager()
