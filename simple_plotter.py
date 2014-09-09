@@ -56,6 +56,8 @@ def parse_cnl_file(filename):
     return cnl_file
 
 
+def get_min_max_x(cnl_file):
+    return ( cnl_file.cols["begin"][0], cnl_file.cols["end"][-1] )
 
 
 def plot(ax, x_values, cols, active_cols, alpha, **kwargs):
@@ -176,6 +178,9 @@ if __name__ == "__main__":
 
     num_cols = 2
 
+    min_x = None
+    max_x = None
+
     old_ax_net = None
     old_ax_cpu = None
     for i in range(0, num_files):
@@ -183,9 +188,21 @@ if __name__ == "__main__":
         filename = args.files[i]
         cnl_file = parse_cnl_file(filename)
 
+        ## update min_x / max_x
+        min_max = get_min_max_x(cnl_file)
+
+        if ( not min_x or min_x > min_max[0] ):
+            min_x = min_max[0]
+
+        if ( not max_x or max_x < min_max[1] ):
+            max_x = min_max[1]
+
+
+        ## show some output
         print( filename )
         print( pretty_json(cnl_file.get_general_header()) )
         print()
+
 
         ## Plot with matplotlib.
 
@@ -217,6 +234,11 @@ if __name__ == "__main__":
         old_ax_cpu = ax_cpu
 
 
+        ## set min/max (remember: The x-axis is shared.)
+        margin = max( (max_x - min_x) * 0.03, 10 )
+        ax_net.set_xlim(min_x - margin, max_x + margin)
+
+
     ## If we have only one input file, plot CPU area charts.
     if ( num_files == 1 ):
         ax1 = fig.add_subplot(2, num_cols, 2, sharex=old_ax_net, sharey=old_ax_cpu)
@@ -227,12 +249,11 @@ if __name__ == "__main__":
 
 
     ## maximize window
-    if ( num_files > 1 or True ):  ## XXX always maximize?
-        try:
-            figManager = plt.get_current_fig_manager()
-            figManager.window.showMaximized()
-        except:
-            pass
+    try:
+        figManager = plt.get_current_fig_manager()
+        figManager.window.showMaximized()
+    except:
+        pass
 
     # show plot
     plt.show()
