@@ -60,6 +60,8 @@ def parse_cnl_file(filename):
 
 def plot(ax, x_values, cols, active_cols, alpha, **kwargs):
     #use_ema = kwargs.get("use_ema")
+    ema_only = kwargs.get("ema_only")
+    smooth = kwargs.get("smooth")
 
     for col_name in active_cols:
         data = cols[col_name]
@@ -67,11 +69,12 @@ def plot(ax, x_values, cols, active_cols, alpha, **kwargs):
             data = merge_lists( data, data )
 
         # * plot *
-        ax.plot(x_values , data, label=col_name, alpha=alpha)
+        if ( not ema_only ):
+            ax.plot(x_values , data, label=col_name, alpha=alpha)
 
         ## plot ema
-        #if ( use_ema ):
-            #ax.plot(x_values , calc_ema(cols[col_name], 0.2), label=col_name+" (ema)")
+        if ( ema_only and smooth ):
+            ax.plot(x_values , calc_ema(data, smooth), label=col_name)
 
 
 def plot_net(ax, cnl_file, alpha, legend_outside=True):
@@ -92,11 +95,19 @@ def plot_net(ax, cnl_file, alpha, legend_outside=True):
         l = ax.legend(loc=0)
 
 
-def plot_cpu(ax, cnl_file, alpha, legend_outside=True):
+def plot_cpu(ax, cnl_file, args):
+    # parameters
+    legend_outside = True
+    alpha = args.opacity if args.transparent_cpu else 1.0
+    smooth = args.smooth_cpu
+
+    # axes
     ax.set_ylim(0,100)
     ax.set_ylabel('CPU util (%)')
 
-    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names, alpha)
+    # * plot *
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names, alpha,
+         ema_only=True if smooth else False, smooth=smooth)
 
     # Legend
     if ( legend_outside ):
@@ -109,7 +120,7 @@ def plot_cpu(ax, cnl_file, alpha, legend_outside=True):
     else:
         l = ax.legend(loc=0)
 
-    ax.set_label("Testlabel")
+    #ax.set_label("Testlabel")
 
     l.draggable(True)
 
@@ -121,20 +132,35 @@ if __name__ == "__main__":
     ## Command line arguments
     import argparse
 
+
+    DEFAULT_OPACITY = 0.7
+    DEFAULT_ALPHA = 0.1             # alpha for ema, the smaller the smoother
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("files", nargs='*')
     parser.add_argument("-tn", "--transparent-net", action="store_true")
     parser.add_argument("-tc", "--transparent-cpu", action="store_true")
     parser.add_argument("-t", "--transparent", action="store_true",
-                        help="Implies --transparent-net and --transparent-cpu")    ## TODO
-    parser.add_argument("--opacity", type=float, default=0.7,
+                        help="Implies --transparent-net and --transparent-cpu")
+    parser.add_argument("--opacity", type=float, default=DEFAULT_OPACITY,
                         help="Default: 0.7")
     parser.add_argument("-nc", "--no-comment", action="store_true")                ## TODO
     parser.add_argument("-p", "--publication", action="store_true",                ## TODO
                         help="Reduces the margins so that the output is more suitable for publications and presentations. (Implies --no-comment)")
 
+    parser.add_argument("-sc", "--smooth-cpu", nargs='?', const=DEFAULT_ALPHA, type=float,
+                        metavar="ALPHA",
+                        help = "Smooth CPU values with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
+
     args = parser.parse_args()
+
+
+    ## set implicated options
+    # --transparent
+    if ( args.transparent ):
+        args.transparent_cpu = True
+        args.transparent_net = True
 
 
     num_files = len(args.files)
@@ -180,7 +206,7 @@ if __name__ == "__main__":
 
         ## Plot
         plot_net(ax_net, cnl_file, args.opacity if args.transparent_net else 1.0)
-        plot_cpu(ax_cpu, cnl_file, args.opacity if args.transparent_cpu else 1.0)
+        plot_cpu(ax_cpu, cnl_file, args)
 
         old_ax_net = ax_net
         old_ax_cpu = ax_cpu
