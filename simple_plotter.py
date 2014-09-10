@@ -148,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--opacity", type=float, default=DEFAULT_OPACITY,
                         help="Default: 0.7")
     parser.add_argument("-nc", "--no-comment", action="store_true")
-    parser.add_argument("-p", "--publication", action="store_true",                ## TODO
+    parser.add_argument("-p", "--publication", action="store_true",
                         help="Reduces the margins so that the output is more suitable for publications and presentations. (Implies --no-comment)")
 
     parser.add_argument("-sc", "--smooth-cpu", nargs='?', const=DEFAULT_ALPHA, type=float,
@@ -168,6 +168,10 @@ if __name__ == "__main__":
     if ( args.transparent ):
         args.transparent_cpu = True
         args.transparent_net = True
+
+    # --publication
+    if ( args.publication ):
+        args.no_comment = True
 
 
     num_files = len(args.files)
@@ -213,7 +217,14 @@ if __name__ == "__main__":
 
 
         ## Prepare subplots
-        fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
+        # Layout
+        if ( args.publication ):
+            # Narrow layout for publications and presentations
+            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.08)
+        else:
+            # Regular layout (for good readability on screen)
+            fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
+
         ax_net = fig.add_subplot(2, num_cols, i+1, sharex=old_ax_net, sharey=old_ax_net)
         ax_cpu = fig.add_subplot(2, num_cols, i+num_cols+1, sharex=ax_net, sharey=old_ax_cpu)
         #ax_net = fig.add_subplot(111)  ## twin axis
