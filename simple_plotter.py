@@ -25,7 +25,7 @@ def append_twice(base_list, extend_list):
 
 
 
-def parse_cnl_file(filename):
+def parse_cnl_file(filename, nic_fields = [".send", ".receive"]):
     ## * Parse input file. *
     cnl_file = CNLParser(filename)
 
@@ -34,7 +34,6 @@ def parse_cnl_file(filename):
     #nics = cnl_file.get_nics()
     nics = ("eth1", "eth2")  ## XXX
     net_cols = list()
-    nic_fields = [".send", ".receive"]
     for nic_name in nics:
         for nic_field in nic_fields:
             net_cols.append( nic_name + nic_field )
@@ -79,7 +78,13 @@ def plot(ax, x_values, cols, active_cols, alpha, **kwargs):
             ax.plot(x_values , calc_ema(data, smooth), label=col_name)
 
 
-def plot_net(ax, cnl_file, alpha, legend_outside=True):
+def plot_net(ax, cnl_file, args):
+    # parameters
+    legend_outside = True
+    alpha = args.opacity if args.transparent_net else 1.0
+    #smooth = args.smooth_net
+
+    # axes
     ax.set_ylim(0,10**10)
     ax.set_ylabel('Throughput (Bit/s)')
 
@@ -155,9 +160,15 @@ if __name__ == "__main__":
                         metavar="ALPHA",
                         help = "Smooth CPU values with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
 
+    # TODO make mutual exclusive
+    parser.add_argument("-sr", "--send-receive", action="store_true",
+                        help="Plots only outgoing data from the first file, and only incoming data from the second file. (If there's only one file, then the outgoing data is plotted.)")
+    parser.add_argument("-rs", "--receive-send", action="store_true",
+                        help="Like --send-receive, but the other way round.")
+
     ## TODO implement (maybe set as default)
-    parser.add_argument("-a", "--all-matches", action="store_true",
-                        help="Finds all matches current directory (or in --files, if specified) and plots them pairwise.")
+    #parser.add_argument("-a", "--all-matches", action="store_true",
+                        #help="Finds all matches current directory (or in --files, if specified) and plots them pairwise.")
 
 
     args = parser.parse_args()
@@ -188,9 +199,20 @@ if __name__ == "__main__":
     old_ax_net = None
     old_ax_cpu = None
     for i in range(0, num_files):
+        nic_fields = [".send", ".receive"]
+
+        # only send/receive
+        if ( args.send_receive ):
+            ind = i % 2
+            nic_fields = nic_fields[ind:ind+1]
+        if ( args.receive_send ):
+            ind = (i+1)%2
+            nic_fields = nic_fields[ind:ind+1]
+
+
         ## Read file
         filename = args.files[i]
-        cnl_file = parse_cnl_file(filename)
+        cnl_file = parse_cnl_file(filename, nic_fields)
 
         ## update min_x / max_x
         min_max = get_min_max_x(cnl_file)
@@ -231,7 +253,7 @@ if __name__ == "__main__":
             cnl_file.x_values = cnl_file.cols["end"]
 
         ## Plot
-        plot_net(ax_net, cnl_file, args.opacity if args.transparent_net else 1.0)
+        plot_net(ax_net, cnl_file, args)
         plot_cpu(ax_cpu, cnl_file, args)
 
         old_ax_net = ax_net
