@@ -147,7 +147,7 @@ if __name__ == "__main__":
                         help="Implies --transparent-net and --transparent-cpu")
     parser.add_argument("--opacity", type=float, default=DEFAULT_OPACITY,
                         help="Default: 0.7")
-    parser.add_argument("-nc", "--no-comment", action="store_true")                ## TODO
+    parser.add_argument("-nc", "--no-comment", action="store_true")
     parser.add_argument("-p", "--publication", action="store_true",                ## TODO
                         help="Reduces the margins so that the output is more suitable for publications and presentations. (Implies --no-comment)")
 
@@ -207,8 +207,9 @@ if __name__ == "__main__":
         ## Plot with matplotlib.
 
         ## Draw comment on the figure (use absolute positioning).
-        t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
-        fig.texts.append(t)
+        if ( not args.no_comment ):
+            t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
+            fig.texts.append(t)
 
 
         ## Prepare subplots
