@@ -217,14 +217,6 @@ if __name__ == "__main__":
 
 
         ## Prepare subplots
-        # Layout
-        if ( args.publication ):
-            # Narrow layout for publications and presentations
-            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.08)
-        else:
-            # Regular layout (for good readability on screen)
-            fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
-
         ax_net = fig.add_subplot(2, num_cols, i+1, sharex=old_ax_net, sharey=old_ax_net)
         ax_cpu = fig.add_subplot(2, num_cols, i+num_cols+1, sharex=ax_net, sharey=old_ax_cpu)
         #ax_net = fig.add_subplot(111)  ## twin axis
@@ -257,6 +249,22 @@ if __name__ == "__main__":
         ax2 = fig.add_subplot(2, num_cols, 4, sharex=ax_net, sharey=old_ax_cpu)
 
         plot_top_cpus( cnl_file, (ax1, ax2), (0,1) )
+
+
+    ## Subplot-Layout (margins)
+    #  NOTE: This actually works great with a screen resolution of 1920x1200.
+    #        Since all space here are in relative size, this might have to be adjusted for other screen resolutions.
+    if ( args.publication ):
+        # Narrow layout for publications and presentations
+        if ( num_files == 1 ):
+            # CPU area charts
+            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.93, top=0.97, hspace=0.3, bottom=0.08)
+        else:
+            # double plot
+            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.08)
+    else:
+        # Regular layout (for good readability on screen)
+        fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
 
 
 
