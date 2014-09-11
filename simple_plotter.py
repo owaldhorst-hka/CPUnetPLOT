@@ -133,6 +133,20 @@ def plot_cpu(ax, cnl_file, args):
 
 
 
+class NameSuggestor:
+    def __init__(self):
+        self.date = list()
+        self.hostname = list()
+
+    def add(self, cnl_file):
+        self.date.append( cnl_file.get_human_readable_date() )
+        self.hostname.append( cnl_file.get_hostname() )
+
+    def suggest_filename(self):
+        print( "{}_{}".format( self.date[0], "_".join(self.hostname) )  ) ## XXX
+        return "{}_{}".format( self.date[0], "_".join(self.hostname) )
+
+
 ## MAIN ##
 if __name__ == "__main__":
 
@@ -186,6 +200,7 @@ if __name__ == "__main__":
 
 
     num_files = len(args.files)
+    name_suggestor = NameSuggestor()
 
     ## Create figure (window/file)
     fig = plt.figure()
@@ -213,6 +228,7 @@ if __name__ == "__main__":
         ## Read file
         filename = args.files[i]
         cnl_file = parse_cnl_file(filename, nic_fields)
+        name_suggestor.add(cnl_file)
 
         ## update min_x / max_x
         min_max = get_min_max_x(cnl_file)
@@ -293,9 +309,11 @@ if __name__ == "__main__":
     ## Set the default format for the save-botton to PDF.
     try:
         fig.canvas.get_default_filetype = lambda: "pdf"
-        fig.canvas.get_default_filename = lambda: "cpunetlog.pdf"   ## TODO suggest a filename
+        suggested_name = "{}-plot.{}".format( name_suggestor.suggest_filename(), fig.canvas.get_default_filetype() )
+        name_func = lambda: suggested_name
+        fig.canvas.get_default_filename = name_func
     except:
-        pass
+        print( "[WARNING] Filename suggestion failed!" )
 
     ## maximize window
     try:

@@ -226,6 +226,9 @@ class CNLParser:
     def get_environment(self):
         return self.header["General"]["Environment"]
 
+    def get_human_readable_date(self):
+        return self.header["General"]["Date"][0]
+
 
 
 ## MAIN ##
