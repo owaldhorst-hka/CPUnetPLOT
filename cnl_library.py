@@ -5,8 +5,7 @@ from io import StringIO
 
 import json
 import csv
-
-
+import os
 
 def merge_lists(first, second):
     """
@@ -99,6 +98,9 @@ class CNLParser:
 
     def __init__(self, filename):
         self.filename = filename
+
+        if ( os.path.isdir(self.filename) ):
+            raise self.WrongFileFormat_Exception()
 
         with open( self.filename ) as in_file:
             ## Check file format version.
