@@ -98,6 +98,7 @@ class CNLParser:
 
     def __init__(self, filename):
         self.filename = filename
+        #print (filename)
 
         if ( os.path.isdir(self.filename) ):
             raise self.WrongFileFormat_Exception()
@@ -116,7 +117,7 @@ class CNLParser:
                 self.csv_header = next(csv_reader)
                 self.csv_index = create_csv_index(self.csv_header)
             except UnicodeDecodeError:
-                self.WrongFileFormat_Exception()
+                raise self.WrongFileFormat_Exception()
 
 
     def get_csv_iterator(self, fields=None):
