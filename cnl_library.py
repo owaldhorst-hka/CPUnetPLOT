@@ -103,17 +103,20 @@ class CNLParser:
             raise self.WrongFileFormat_Exception()
 
         with open( self.filename ) as in_file:
-            ## Check file format version.
-            if ( not in_file.readline() == "%% CPUnetLOGv1\n" ):
-                raise self.WrongFileFormat_Exception()
+            try:
+                ## Check file format version.
+                if ( not in_file.readline() == "%% CPUnetLOGv1\n" ):
+                    raise self.WrongFileFormat_Exception()
 
-            ## Read JSON header.
-            self.header = read_header(in_file)
+                ## Read JSON header.
+                self.header = read_header(in_file)
 
-            ## Read CSV "header"
-            csv_reader = csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
-            self.csv_header = next(csv_reader)
-            self.csv_index = create_csv_index(self.csv_header)
+                ## Read CSV "header"
+                csv_reader = csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
+                self.csv_header = next(csv_reader)
+                self.csv_index = create_csv_index(self.csv_header)
+            except UnicodeDecodeError:
+                self.WrongFileFormat_Exception()
 
 
     def get_csv_iterator(self, fields=None):
