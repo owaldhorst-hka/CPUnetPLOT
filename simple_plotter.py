@@ -276,11 +276,6 @@ if __name__ == "__main__":
         old_ax_cpu = ax_cpu
 
 
-        ## set min/max (remember: The x-axis is shared.)
-        margin = max( (max_x - min_x) * 0.03, 10 )
-        ax_net.set_xlim(min_x - margin, max_x + margin)
-
-
     ## If we have only one input file, plot CPU area charts.
     if ( num_files == 1 ):
         ax1 = fig.add_subplot(2, num_cols, 2, sharex=old_ax_net, sharey=old_ax_cpu)
@@ -303,6 +298,12 @@ if __name__ == "__main__":
     else:
         # Regular layout (for good readability on screen)
         fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)
+
+
+
+    ## set min/max (remember: The x-axis is shared.)
+    margin = max( (max_x - min_x) * 0.03, 10 )
+    ax_net.set_xlim(min_x - margin, max_x + margin)
 
 
 
