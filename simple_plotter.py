@@ -82,13 +82,14 @@ def plot_net(ax, cnl_file, args):
     # parameters
     legend_outside = True
     alpha = args.opacity if args.transparent_net else 1.0
-    #smooth = args.smooth_net
+    smooth = args.smooth_net
 
     # axes
     ax.set_ylim(0,10**10)
     ax.set_ylabel('Throughput (Bit/s)')
 
-    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, alpha)
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, alpha,
+         ema_only=True if smooth else False, smooth=smooth)
 
     # Legend
     if ( legend_outside ):
@@ -173,6 +174,12 @@ if __name__ == "__main__":
     parser.add_argument("-sc", "--smooth-cpu", nargs='?', const=DEFAULT_ALPHA, type=float,
                         metavar="ALPHA",
                         help = "Smooth CPU values with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
+
+    ## XXX experimental..
+    parser.add_argument("-sn", "--smooth-net", nargs='?', const=DEFAULT_ALPHA, type=float,
+                        metavar="ALPHA",
+                        help = "Smooth transmission rates with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
+
 
     # TODO make mutual exclusive
     parser.add_argument("-sr", "--send-receive", action="store_true",
