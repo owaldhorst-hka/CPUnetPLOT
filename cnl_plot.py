@@ -202,7 +202,7 @@ def plot_net(ax, cnl_file, args):
 
     # axes
     ax.set_ylim(0,10**10)
-    ax.set_ylabel('Throughput (Bit/s)')
+    ax.set_ylabel('Throughput (Bit/s)', fontsize=args.axis_fontsize)
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, alpha,
          ema_only=True if smooth else False, smooth=smooth)
@@ -214,7 +214,7 @@ def plot_net(ax, cnl_file, args):
 
         l = ax.legend( loc='upper left', bbox_to_anchor=(0, 0), ncol=int(len(cnl_file.net_col_names)/2),
                       bbox_transform = trans,
-                      fancybox=False, shadow=False)
+                      fancybox=False, shadow=False, fontsize=args.legend_fontsize)
     else:
         l = ax.legend(loc=0)
 
@@ -227,7 +227,7 @@ def plot_cpu(ax, cnl_file, args):
 
     # axes
     ax.set_ylim(0,100)
-    ax.set_ylabel('CPU util (%)')
+    ax.set_ylabel('CPU util (%)', fontsize=args.axis_fontsize)
 
     # * plot *
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.cpu_col_names, alpha,
@@ -240,7 +240,7 @@ def plot_cpu(ax, cnl_file, args):
 
         l = ax.legend( loc='upper left', bbox_to_anchor=(0, 0), ncol=int(len(cnl_file.cpu_col_names)/2),
                       bbox_transform = trans,
-                      fancybox=False, shadow=False)
+                      fancybox=False, shadow=False, fontsize=args.legend_fontsize)
     else:
         l = ax.legend(loc=0)
 
@@ -310,6 +310,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    ## font size (there is no cmd-line option for this, [yet?])
+    args.axis_fontsize = 12
+    args.legend_fontsize = 12
+
 
     ## set implicated options
     # --transparent
@@ -320,7 +324,8 @@ if __name__ == "__main__":
     # --publication
     if ( args.publication ):
         args.no_comment = True
-
+        args.axis_fontsize = 20
+        args.legend_fontsize = 16
 
     num_files = len(args.files)
     name_suggestor = NameSuggestor()
@@ -409,20 +414,25 @@ if __name__ == "__main__":
         ax1 = fig.add_subplot(2, num_cols, 2, sharex=old_ax_net, sharey=old_ax_cpu)
         ax2 = fig.add_subplot(2, num_cols, 4, sharex=ax_net, sharey=old_ax_cpu)
 
-        plot_top_cpus( cnl_file, (ax1, ax2), (0,1) )
+        plot_top_cpus( cnl_file, args, (ax1, ax2), (0,1) )
 
 
     ## Subplot-Layout (margins)
     #  NOTE: This actually works great with a screen resolution of 1920x1200.
     #        Since all space here are in relative size, this might have to be adjusted for other screen resolutions.
     if ( args.publication ):
+        ## TODO What about the fontsize? Only increase for slides, or for publication in general..?
+
         # Narrow layout for publications and presentations
         if ( num_files == 1 ):
             # CPU area charts
-            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.93, top=0.97, hspace=0.3, bottom=0.08)
+            #fig.subplots_adjust(left=0.03, wspace=0.15, right=0.93, top=0.97, hspace=0.3, bottom=0.08) ## small font size
+            fig.subplots_adjust(left=0.04, wspace=0.15, right=0.92, top=0.97, hspace=0.3, bottom=0.09) ## large font, legend on the right
+            #fig.subplots_adjust(left=0.04, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.09) ## large font, legend below
         else:
             # double plot
-            fig.subplots_adjust(left=0.03, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.08)
+            #fig.subplots_adjust(left=0.03, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.08) ## small font size
+            fig.subplots_adjust(left=0.04, wspace=0.15, right=0.99, top=0.97, hspace=0.3, bottom=0.09)
     else:
         # Regular layout (for good readability on screen)
         fig.subplots_adjust(left=0.1, wspace=0.2, right=0.9, top=0.92, hspace=0.4, bottom=0.12)

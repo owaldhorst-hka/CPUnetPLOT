@@ -5,6 +5,7 @@ from operator import itemgetter
 from matplotlib import transforms
 import numpy
 import copy
+import math
 
 from cnl_library import merge_lists
 
@@ -62,7 +63,7 @@ def _create_cpu_cols_by_util(cnl_file):
 
 
 
-def plot_area_chart(ax, cnl_file, cols, legend_outside=True, legend_title=None):
+def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
     """
     Plots an area chart of the CPU utilization (usr, sys, ...).
     """
@@ -74,7 +75,7 @@ def plot_area_chart(ax, cnl_file, cols, legend_outside=True, legend_title=None):
     # Axes
     ax.set_ylim(0,100)
     #ax.set_ylabel('CPU ' + "/".join(cpu_fields) + ' (%)')
-    ax.set_ylabel('CPU util (%)')
+    ax.set_ylabel('CPU util (%)', fontsize=args.axis_fontsize)
 
     # Plot
     y_offsets = numpy.array([0.0] * len(cnl_file.cols["begin"]))
@@ -109,17 +110,33 @@ def plot_area_chart(ax, cnl_file, cols, legend_outside=True, legend_title=None):
 
     # Legend
     if ( legend_outside ):
-        offset = transforms.ScaledTranslation(20, 0, transforms.IdentityTransform())
-        trans = ax.transAxes + offset
+        ## Legend on the right
+        if ( args.legend_fontsize == 12 or True ):  ## XXX
+            offset = transforms.ScaledTranslation(20, 0, transforms.IdentityTransform())
+            trans = ax.transAxes + offset
 
-        l = ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.02),fancybox=True, shadow=True, title=legend_title)
+            l = ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.02),fancybox=True, shadow=True, title=legend_title,
+                          fontsize=args.legend_fontsize)
+
+        ## Legend below
+        else:
+            offset = transforms.ScaledTranslation(0, -20, transforms.IdentityTransform())
+            trans = ax.transAxes + offset
+
+            l = ax.legend( loc='upper left', bbox_to_anchor=(0, 0),
+                           fancybox=True, shadow=True, title=legend_title,
+                           #ncol=math.ceil(len(cpu_fields)/2),
+                           ncol=len(cpu_fields),
+                           bbox_transform = trans,
+                           fontsize=args.legend_fontsize)
+
     else:
         l = ax.legend(loc=0)
 
     l.draggable(True)
 
 
-def plot_top_cpus(cnl_file, axes, indices=[0]):
+def plot_top_cpus(cnl_file, args, axes, indices=[0]):
     """
     This function creates "virtual top-cpus" and plots the utilization fields (usr, system, ...)
 
@@ -141,5 +158,5 @@ def plot_top_cpus(cnl_file, axes, indices=[0]):
     for ax, i in zip(axes, indices):
         label = "Top #{} CPU".format(i+1)
         cols = top_cpus[i]
-        plot_area_chart(ax, cnl_file, cols, True, label)
+        plot_area_chart(ax, cnl_file, args, cols, True, label)
 
