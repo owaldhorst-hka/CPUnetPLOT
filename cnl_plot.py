@@ -468,5 +468,10 @@ if __name__ == "__main__":
     except:
         pass
 
+
+    ## Workaround: "pdf-presenter-console" needs this, otherwise no text is displayed at all.
+    matplotlib.rc('pdf', fonttype=42)
+
+
     # show plot
     plt.show()
