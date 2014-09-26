@@ -7,6 +7,26 @@ import json
 import csv
 import os
 
+
+def human_readable_from_seconds(seconds):
+    if ( seconds == 0 ):
+        return "0"
+
+    if ( seconds <= 5 ):
+        return "{:.2}s".format(seconds)
+
+    elif ( seconds <= 2*60 ):
+        return "{}s".format(round(seconds))
+
+    elif ( seconds <= 5*60 ):
+        return "{}min {}s".format(round(seconds/60), round(seconds%60))
+
+    elif ( seconds <= 2*60*60 ):
+        return "{}min".format(round(seconds/60), round(seconds%60))
+
+    else:
+        return "{}h {}min".format(round(seconds/3600), round( (seconds/60)%60) )
+
 def merge_lists(first, second):
     """
     Merges two lists alternately.
@@ -235,6 +255,8 @@ class CNLParser:
     def get_human_readable_date(self):
         return self.header["General"]["Date"][0]
 
+    def get_machine_readable_date(self):
+        return self.header["General"]["Date"][1]
 
 
 ## MAIN ##

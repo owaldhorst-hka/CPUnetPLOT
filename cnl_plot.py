@@ -3,8 +3,9 @@
 
 import sys
 import matplotlib
+import matplotlib.ticker as ticker
 
-from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json
+from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json, human_readable_from_seconds
 from plot_cpu import plot_top_cpus
 
 
@@ -20,6 +21,121 @@ def append_twice(base_list, extend_list):
     else:
         base_list.append(extend_list)
         base_list.append(extend_list)
+
+
+
+## TODO Maybe this class should be moved to another file..
+class TimeLocator(matplotlib.ticker.Locator):
+    """
+    Place the ticks to be nice seconds/minutes/hours values.
+    """
+
+    def __init__(self, numticks=5):
+        #self._base = Base(base)
+        self.numticks = numticks
+
+    def __call__(self):
+        'Return the locations of the ticks'
+        vmin, vmax = self.axis.get_view_interval()
+        return self.tick_values(vmin, vmax)
+
+
+    def _shrink_to_a_multiple_of(self, origin, divisor, maxdiff=0):
+        diff = origin % divisor
+
+        # BRANCH: external max-diff
+        if ( maxdiff > 0 ):
+            if ( diff <= maxdiff ):
+                origin -= diff
+
+        # BRANCH: automatic max-diff
+        elif ( diff < origin * 0.2 ):
+            origin -= diff
+
+        return origin
+
+
+    def _make_nice(self, value, maxdiff=0):
+        ## TODO Find out if this approach gets the desired results...
+
+        ## TODO quit loop after it worked?, actually make a loop
+        value = self._shrink_to_a_multiple_of(value, 60*60, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 60*30, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 60*15, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 60*10, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 60*5, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 60, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 30, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 15, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 10, maxdiff)
+        value = self._shrink_to_a_multiple_of(value, 5, maxdiff)
+
+        return value
+
+
+    def tick_values(self, vmin, vmax):
+        if vmax < vmin:
+            vmin, vmax = vmax, vmin
+
+
+        ## Find a nice stepping for the ticks.
+
+        diff = vmax-vmin
+
+        # If the scale starts almost with 0, concentrate on the positive side.
+        if ( vmin <= 0 and 0 < vmax and vmin*-1 < diff / (2*self.numticks)):
+            diff = vmax - 0
+
+        step = diff / self.numticks
+        nice_step = self._make_nice(step)
+
+
+        ## Place the ticks.
+
+        locs = list()
+
+        # Tick »0« if it is in range
+        if ( vmin <= 0 and 0 < vmax ):
+            base = 0
+        else:
+            base = self._make_nice(vmin)  ## TODO make nice with +, instead - ?
+
+        # ticks to the right
+        pos = base
+        while ( pos <= vmax ):
+            locs.append(pos)
+            pos += nice_step
+
+        # ticks to the left
+        pos = base - nice_step
+        while ( pos >= vmin ):
+            locs.append(pos)
+            pos -= nice_step
+
+
+        ## Add an additional (still nice) max label, if appropriate.
+        additional_max_tick = self._make_nice(vmax, 0.25 * nice_step)
+        if ( additional_max_tick - max(locs) >= 0.5 * nice_step ):
+            locs.append(additional_max_tick)
+
+
+        return self.raise_if_exceeds(locs)
+
+
+    #def view_limits(self, dmin, dmax):
+        #"""
+        #Set the view limits to the nearest multiples of base that
+        #contain the data
+        #"""
+        #vmin = self._base.le(dmin)
+        #vmax = self._base.ge(dmax)
+        #if vmin == vmax:
+            #vmin -= 1
+            #vmax += 1
+
+        #return mtransforms.nonsingular(vmin, vmax)
+
+
 
 
 
@@ -275,6 +391,11 @@ if __name__ == "__main__":
         else:
             cnl_file.x_values = cnl_file.cols["end"]
 
+        # shift x-values  ## TODO find a single base-time for all files?
+        #base_time = min_max[0]
+        base_time = cnl_file.get_machine_readable_date()
+        cnl_file.x_values = [ x - base_time for x in cnl_file.x_values ]
+
         ## Plot
         plot_net(ax_net, cnl_file, args)
         plot_cpu(ax_cpu, cnl_file, args)
@@ -308,10 +429,17 @@ if __name__ == "__main__":
 
 
 
+    ## TODO, maybe the TimeLocator can do this better? (see TimeLocator.view_limits)
     ## set min/max (remember: The x-axis is shared.)
     margin = max( (max_x - min_x) * 0.03, 10 )
-    ax_net.set_xlim(min_x - margin, max_x + margin)
+    ax_net.set_xlim(min_x - margin - base_time, max_x + margin - base_time)  ## XXX Like that, it's the base-time from the latest file...
 
+
+    ## Format tick labels TESTING
+    def format_ticks(x, pos=None):
+        return human_readable_from_seconds(float(x))
+    ax_net.xaxis.set_major_formatter( ticker.FuncFormatter(format_ticks) )
+    ax_net.xaxis.set_major_locator( TimeLocator() )
 
 
     ## Set the default format for the save-botton to PDF.
