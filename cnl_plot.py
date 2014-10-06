@@ -42,8 +42,8 @@ def parse_cnl_file(filename, nic_fields = [".send", ".receive"]):
 
     ## Prepare data for matplotlib
 
-    #nics = cnl_file.get_nics()
-    nics = ("eth1", "eth2")  ## XXX
+    nics = cnl_file.get_nics()
+    #nics = ("eth1", "eth2")  ## XXX
     net_cols = list()
     for nic_name in nics:
         for nic_field in nic_fields:
