@@ -63,7 +63,7 @@ def _create_cpu_cols_by_util(cnl_file):
 
 
 
-def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
+def plot_area_chart(ax, cnl_file, args, layout, cols, legend_outside, legend_title):
     """
     Plots an area chart of the CPU utilization (usr, sys, ...).
     """
@@ -75,7 +75,7 @@ def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
     # Axes
     ax.set_ylim(0,100)
     #ax.set_ylabel('CPU ' + "/".join(cpu_fields) + ' (%)')
-    ax.set_ylabel('CPU util (%)', fontsize=args.axis_fontsize)
+    ax.set_ylabel('CPU util (%)', fontsize=layout.fontsize.axis_labels)
 
     # Plot
     y_offsets = numpy.array([0.0] * len(cnl_file.cols["begin"]))
@@ -111,12 +111,12 @@ def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
     # Legend
     if ( legend_outside ):
         ## Legend on the right
-        if ( args.legend_fontsize == 12 or True ):  ## XXX
+        if ( True ):  ## XXX
             offset = transforms.ScaledTranslation(20, 0, transforms.IdentityTransform())
             trans = ax.transAxes + offset
 
             l = ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.02),fancybox=True, shadow=True, title=legend_title,
-                          fontsize=args.legend_fontsize)
+                          fontsize=layout.fontsize.legend)
 
         ## Legend below
         else:
@@ -128,7 +128,7 @@ def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
                            #ncol=math.ceil(len(cpu_fields)/2),
                            ncol=len(cpu_fields),
                            bbox_transform = trans,
-                           fontsize=args.legend_fontsize)
+                           fontsize=layout.fontsize.legend)
 
     else:
         l = ax.legend(loc=0)
@@ -136,7 +136,7 @@ def plot_area_chart(ax, cnl_file, args, cols, legend_outside, legend_title):
     l.draggable(True)
 
 
-def plot_top_cpus(cnl_file, args, axes, indices=[0]):
+def plot_top_cpus(cnl_file, args, layout, axes, indices=[0]):
     """
     This function creates "virtual top-cpus" and plots the utilization fields (usr, system, ...)
 
@@ -158,5 +158,5 @@ def plot_top_cpus(cnl_file, args, axes, indices=[0]):
     for ax, i in zip(axes, indices):
         label = "Top #{} CPU".format(i+1)
         cols = top_cpus[i]
-        plot_area_chart(ax, cnl_file, args, cols, True, label)
+        plot_area_chart(ax, cnl_file, args, layout, cols, True, label)
 
