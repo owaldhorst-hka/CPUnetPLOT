@@ -1,0 +1,7 @@
+## CNL-Tools
+
+BASE=""  # <-- Please modify to fit your installation.
+
+alias cnl_ls="$BASE/cpunetreader/cnl_ls.py"
+alias cnl_summary="$BASE/cpunetreader/summary.py"
+alias cnl_plot='"$BASE/cpunetreader/cnl_plot.py"
