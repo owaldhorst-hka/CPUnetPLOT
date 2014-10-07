@@ -1,5 +1,14 @@
 # -*- coding:utf-8 -*-
 
+# Copyright (c) 2014,
+# Karlsruhe Institute of Technology, Institute of Telematics
+#
+# This code is provided under the BSD 2-Clause License.
+# Please refer to the LICENSE.txt file for further information.
+#
+# Author: Mario Hock
+
+
 import matplotlib.ticker as ticker
 from cnl_library import human_readable_from_seconds
 
