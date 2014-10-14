@@ -292,8 +292,9 @@ if __name__ == "__main__":
         ## Plot with matplotlib.
 
         ## Draw comment on the figure (use absolute positioning).
-        if ( not args.no_comment ):
-            t = matplotlib.text.Text(10,10, "Comment: " + cnl_file.get_comment(), figure=fig)
+        comment = cnl_file.get_comment()
+        if ( comment and not args.no_comment ):
+            t = matplotlib.text.Text(10,10, "Comment: " + comment, figure=fig)
             fig.texts.append(t)
 
 
