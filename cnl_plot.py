@@ -112,7 +112,7 @@ def plot_net(ax, cnl_file, args, layout):
     smooth = args.smooth_net
 
     # axes
-    ax.set_ylim(0,10**10)
+    ax.set_ylim(top=args.net_scale)
     ax.set_ylabel('Throughput (Bit/s)', fontsize=layout.fontsize.axis_labels)
 
     plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_names, alpha,
@@ -182,6 +182,7 @@ if __name__ == "__main__":
 
     DEFAULT_OPACITY = 0.7
     DEFAULT_ALPHA = 0.1             # alpha for ema, the smaller the smoother
+    DEFAULT_Y_RANGE = 10 ** 10
 
     parser = argparse.ArgumentParser()
 
@@ -203,6 +204,9 @@ if __name__ == "__main__":
     parser.add_argument("-sn", "--smooth-net", nargs='?', const=DEFAULT_ALPHA, type=float,
                         metavar="ALPHA",
                         help = "Smooth transmission rates with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
+
+    parser.add_argument("-nsc", "--net-scale", type=float, default=DEFAULT_Y_RANGE,
+                        help="[Bit]; Default: 0,10**10")
 
 
     # TODO make mutual exclusive
@@ -239,8 +243,7 @@ if __name__ == "__main__":
 
     # axes
     args.x_minutes = True
-    args.y_10G = True
-
+    args.adapt_net_yticks = True
 
     num_files = len(args.files)
     name_suggestor = NameSuggestor()
@@ -353,8 +356,8 @@ if __name__ == "__main__":
     if ( args.x_minutes ):
         ax_net.xaxis.set_major_locator( plot_ticks.TimeLocator() )
         ax_net.xaxis.set_major_formatter( matplotlib.ticker.FuncFormatter(plot_ticks.format_xticks_minutes) )
-    if ( args.y_10G ):
-        ax_net.yaxis.set_major_formatter( matplotlib.ticker.FuncFormatter(plot_ticks.format_yticks_10G) )
+    if ( args.adapt_net_yticks ):
+        ax_net.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(plot_ticks.format_yticks))
 
     ## Set the default format for the save-button to "PDF".
     try:
