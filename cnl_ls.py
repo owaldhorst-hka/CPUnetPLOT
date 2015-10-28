@@ -31,7 +31,7 @@ def are_close(cnl_file1, cnl_file2):
     t1 = get_begin(cnl_file1)
     t2 = get_begin(cnl_file2)
 
-    return abs(t1 - t2) < 2
+    return abs(t1 - t2) < 10
 
 
 def find_match(cnl_file, list_of_files):
