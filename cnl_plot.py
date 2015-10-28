@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
     DEFAULT_OPACITY = 0.7
     DEFAULT_ALPHA = 0.1             # alpha for ema, the smaller the smoother
-    DEFAULT_Y_RANGE = 10 ** 10
+    DEFAULT_Y_RANGE = 10  # Gbit/s
 
     parser = argparse.ArgumentParser()
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
                         help = "Smooth transmission rates with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
 
     parser.add_argument("-nsc", "--net-scale", type=float, default=DEFAULT_Y_RANGE,
-                        help="[Bit]; Default: 0,10**10")
+                        help="[Gbit/s]; Default: 10")
 
 
     # TODO make mutual exclusive
@@ -229,6 +229,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     layout = plot_layout.Layout("default")
 
+
+    args.net_scale *= 10**9  # --> multiply by 10**9 to get Gbit/s
+	
     ## set implicated options
     # --transparent
     if ( args.transparent ):
