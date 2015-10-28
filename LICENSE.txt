@@ -7,7 +7,9 @@ Institute of Telematics
 Zirkel 2, 76131 Karlsruhe
 Germany
 
-and is licensed under the "BSD 2-Clause License":
+with contributions from some individuals, listed below.
+
+The software is licensed under the "BSD 2-Clause License":
 
 --------------------------------------------------------------------------------
 
@@ -36,3 +38,12 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ================================================================================
+
+
+Special thanks for contributions goes to:
+
+- Michael Herzog <michael.herzog2@student.kit.edu>
+
+--> For details about the contributions please refer to the GIT-history.
+
+    
