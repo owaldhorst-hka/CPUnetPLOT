@@ -8,7 +8,7 @@
 #
 # Author: Mario Hock
 
-
+import math
 import matplotlib.ticker as ticker
 from cnl_library import human_readable_from_seconds
 
@@ -101,11 +101,11 @@ class TimeLocator(ticker.Locator):
             locs.append(pos)
             pos -= nice_step
 
-
+        # needs to much space
         ## Add an additional (still nice) max label, if appropriate.
-        additional_max_tick = self._make_nice(vmax, 0.25 * nice_step)
-        if ( additional_max_tick - max(locs) >= 0.5 * nice_step ):
-            locs.append(additional_max_tick)
+        #additional_max_tick = self._make_nice(vmax, 0.25 * nice_step)
+        #if ( additional_max_tick - max(locs) >= 0.5 * nice_step ):
+        #    locs.append(additional_max_tick)
 
 
         return self.raise_if_exceeds(locs)
@@ -133,8 +133,28 @@ def format_xticks_time(x, pos=None):
     return human_readable_from_seconds(float(x))
 
 def format_xticks_minutes(x, pos=None):
-    return "0" if x == 0 else "{:.0f}min".format(float(x)/60)
+    if x  == 0:
+        return "0"
+    elif 0 < x < 60:
+        return "{:.0f}s".format(x)
+    elif 60 <= x < 3600:
+        if (x%60 != 0.):
+            return "{:.0f}".format(math.floor(x/60.))+".{:.0f}min".format(x%60.)
+        else:
+            return "{:.0f}min".format(x/60)
+    else:
+        if (x%3600 != 0.):
+            return "{:.0f}".format(math.floor(x/3600.))+":{:.0f}h".format(x%3600./60.)
+        else:
+            return "{:.0f}h".format(x/3600.)
+        return "{:.0f}h".format(x/3600)
 
-def format_yticks_10G(y, pos=None):
-    return "0" if y == 0 else "{:.0f}G ".format(y / 1000000000)
-
+def format_yticks(y, pos=None):
+    if y < 1000:
+        return "{:.0f} ".format(float(y) / 1)
+    elif 1000 <= y < 1000000:
+        return "{:.0f}K ".format(float(y) / 1000)
+    elif 1000000 <= y < 1000000000:
+        return "{:.0f}M ".format(float(y) / 1000000)
+    else:
+        return "{:.0f}G ".format(float(y) / 1000000000)
