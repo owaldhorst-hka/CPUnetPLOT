@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
     DEFAULT_OPACITY = 0.7
     DEFAULT_ALPHA = 0.1             # alpha for ema, the smaller the smoother
-    DEFAULT_Y_RANGE = 10  # Gbit/s
+    DEFAULT_Y_RANGE = 1  # Gbit/s
 
     parser = argparse.ArgumentParser()
 
