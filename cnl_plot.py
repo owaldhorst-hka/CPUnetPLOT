@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use('QT4Agg')  # override matplotlibrc (optional)
 import matplotlib.pyplot as plt
 
-from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json
+from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json, get_common_base_time
 from plot_cpu import plot_top_cpus
 import plot_ticks
 import plot_layout
@@ -45,18 +45,33 @@ def append_twice(base_list, extend_list):
 
 
 
-def parse_cnl_file(filename, nic_fields = [".send", ".receive"]):
+def parse_cnl_file(filename, nic_fields = ["send", "receive"], nics=None):
+    """
+        nics == None: Plot all nics and name them automatically
+        nics == Dict( nic-name --> nic-label )
+    """
+
     ## * Parse input file. *
     cnl_file = CNLParser(filename)
 
     ## Prepare data for matplotlib
 
-    nics = cnl_file.get_nics()
+    all_nics = cnl_file.get_nics()
     #nics = ("eth1", "eth2")  ## XXX
     net_cols = list()
-    for nic_name in nics:
-        for nic_field in nic_fields:
-            net_cols.append( nic_name + nic_field )
+    net_labels = list()
+    for nic_name in all_nics:
+        try:
+            if ( nics ):
+                nic_label = nics[nic_name]  # NOTE: may fail, in this case we're not interested in this nic
+            else:
+                nic_label = nic_name
+
+            for nic_field in nic_fields:
+                    net_cols.append( nic_name + "." + nic_field )
+                    net_labels.append( "{} ({})".format(nic_label, nic_field) )
+        except (KeyError):
+            pass
 
     cpu_cols = [ cpu_name + ".util" for cpu_name in cnl_file.get_cpus() ]
     cpu_col_labels = [ cpu_name for cpu_name in cnl_file.get_cpus() ]
@@ -69,6 +84,7 @@ def parse_cnl_file(filename, nic_fields = [".send", ".receive"]):
     ## Augment cnl_file with processed data.
     cnl_file.cols = cols
     cnl_file.net_col_names = net_cols
+    cnl_file.net_col_labels = net_labels
     cnl_file.cpu_col_names = cpu_cols
     cnl_file.cpu_col_labels = cpu_col_labels
     #cnl_file.x_values = x_values
@@ -115,7 +131,7 @@ def plot_net(ax, cnl_file, args, layout):
     ax.set_ylim(top=args.net_scale)
     ax.set_ylabel('Throughput (Bit/s)', fontsize=layout.fontsize.axis_labels)
 
-    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_names, alpha,
+    plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
          ema_only=True if smooth else False, smooth=smooth)
 
     # Legend
@@ -255,6 +271,10 @@ if __name__ == "__main__":
     fig = plt.figure()
     fig.canvas.set_window_title('CPUnetPlot')
 
+
+    common_base_time = get_common_base_time(args.files)
+
+
     num_cols = 2
 
     min_x = None
@@ -263,7 +283,7 @@ if __name__ == "__main__":
     old_ax_net = None
     old_ax_cpu = None
     for i in range(0, num_files):
-        nic_fields = [".send", ".receive"]
+        nic_fields = ["send", "receive"]
 
         # only send/receive
         if ( args.send_receive ):
@@ -322,9 +342,9 @@ if __name__ == "__main__":
         else:
             cnl_file.x_values = cnl_file.cols["end"]
 
-        # shift x-values  ## TODO FIXME [IMPORTANT] find a single base-time for all files?
-        #base_time = min_max[0]
-        base_time = cnl_file.get_machine_readable_date()
+        # shift x-values
+        #base_time = cnl_file.get_machine_readable_date()
+        base_time = common_base_time
         cnl_file.x_values = [ x - base_time for x in cnl_file.x_values ]
 
         ## Plot
