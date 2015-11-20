@@ -17,6 +17,23 @@ import csv
 import os
 
 
+
+def get_common_base_time(cnl_files):
+    base_times = list()
+
+    for file in cnl_files:
+        if ( type(file) == str ):
+            cnl_file = CNLParser(file)
+        else:
+            cnl_file = file
+
+        base_times.append( cnl_file.get_machine_readable_date() )
+
+    common_base_time = min( base_times )
+
+    return common_base_time
+
+
 def human_readable_from_seconds(seconds):
     if ( seconds == 0 ):
         return "0"

@@ -102,10 +102,14 @@ def get_min_max_x(cnl_file):
 
 
 
-def plot(ax, x_values, cols, active_cols, col_labels, alpha, **kwargs):
+def plot(ax, x_values, cols, active_cols, col_labels, alpha, color=None, **kwargs):
     #use_ema = kwargs.get("use_ema")
     ema_only = kwargs.get("ema_only")
     smooth = kwargs.get("smooth")
+
+    plot_kws = dict()
+    if ( color ):
+        plot_kws["color"] = color
 
     for col_name, col_label in zip(active_cols, col_labels):
         data = cols[col_name]
@@ -114,11 +118,11 @@ def plot(ax, x_values, cols, active_cols, col_labels, alpha, **kwargs):
 
         # * plot *
         if ( not ema_only ):
-            ax.plot(x_values , data, label=col_label, alpha=alpha)
+            ax.plot(x_values , data, label=col_label, alpha=alpha, **plot_kws)
 
         ## plot ema
         if ( ema_only and smooth ):
-            ax.plot(x_values , calc_ema(data, smooth), label=col_label)
+            ax.plot(x_values , calc_ema(data, smooth), label=col_label, **plot_kws)
 
 
 def plot_net(ax, cnl_file, args, layout):
