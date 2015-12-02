@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-# Copyright (c) 2014,
+# Copyright (c) 2015,
 # Karlsruhe Institute of Technology, Institute of Telematics
 #
 # This code is provided under the BSD 2-Clause License.
