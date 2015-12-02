@@ -103,15 +103,23 @@ def get_min_max_x(cnl_file):
 
 
 def plot(ax, x_values, cols, active_cols, col_labels, alpha, color=None, **kwargs):
+    """
+      [color] should be either None or a list,
+      if there are more lines to plot then colors in the list, the list is cycled-through (with modulo)
+    """
+    
     #use_ema = kwargs.get("use_ema")
     ema_only = kwargs.get("ema_only")
     smooth = kwargs.get("smooth")
 
     plot_kws = dict()
-    if ( color ):
-        plot_kws["color"] = color
+    i=0
 
     for col_name, col_label in zip(active_cols, col_labels):
+        if ( color ):
+            plot_kws["color"] = color[i % len(color)]
+
+
         data = cols[col_name]
         if ( len(x_values) == len(data)*2 ):
             data = merge_lists( data, data )
@@ -124,6 +132,7 @@ def plot(ax, x_values, cols, active_cols, col_labels, alpha, color=None, **kwarg
         if ( ema_only and smooth ):
             ax.plot(x_values , calc_ema(data, smooth), label=col_label, **plot_kws)
 
+        i+=1
 
 def plot_net(ax, cnl_file, args, layout):
     # parameters
