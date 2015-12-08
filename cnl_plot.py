@@ -69,7 +69,12 @@ def parse_cnl_file(filename, nic_fields = ["send", "receive"], nics=None):
 
             for nic_field in nic_fields:
                     net_cols.append( nic_name + "." + nic_field )
-                    net_labels.append( "{} ({})".format(nic_label, nic_field) )
+
+                    # append "(send)" / "(receive)" (only) if both values are plotted
+                    if ( len(nic_fields) > 1 ):
+                        net_labels.append( "{} ({})".format(nic_label, nic_field) )
+                    else:
+                        net_labels.append( nic_label )
         except (KeyError):
             pass
 
