@@ -240,7 +240,17 @@ if __name__ == "__main__":
                         help = "Smooth transmission rates with exponential moving average. (Disabled by default. When specified without parameter: ALPHA=0.1)" )
 
     parser.add_argument("-nsc", "--net-scale", type=float, default=DEFAULT_Y_RANGE,
-                        help="[Gbit/s]; Default: 10")
+                        help="[Gbit/s]; Default: 1")
+
+    parser.add_argument("-10g", "--is_10g", action="store_true",
+                        help="Optimize plot-settings for 10G experiments.")
+
+    parser.add_argument("-1g", "--is_1g", action="store_true",
+                        help="Optimize plot-settings for 1G experiments.")
+
+    parser.add_argument("-100m", "--is_100m", action="store_true",
+                        help="Optimize plot-settings for 100M experiments.")
+
 
 
     # TODO make mutual exclusive
@@ -276,6 +286,14 @@ if __name__ == "__main__":
     if ( args.publication ):
         args.no_comment = True
         layout = plot_layout.Layout("presentation")
+
+    # -10g / -1g / -100m
+    if ( args.is_10g ):
+        args.net_scale = 10 * 10**9
+    if ( args.is_1g ):
+        args.net_scale = 1 * 10**9
+    if ( args.is_100m ):
+        args.net_scale = 0.1 * 10**9
 
 
     # axes
