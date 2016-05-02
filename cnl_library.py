@@ -18,7 +18,8 @@ import os
 
 
 
-def get_common_base_time(cnl_files):
+
+def get_base_times(cnl_files):
     base_times = list()
 
     for file in cnl_files:
@@ -29,6 +30,11 @@ def get_common_base_time(cnl_files):
 
         base_times.append( cnl_file.get_machine_readable_date() )
 
+    return base_times
+
+
+def get_common_base_time(cnl_files):
+    base_times = get_base_times(cnl_files)
     common_base_time = min( base_times )
 
     return common_base_time

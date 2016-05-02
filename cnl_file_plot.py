@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import os
 import copy
 
-from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json, get_common_base_time
+from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json, get_common_base_time, get_base_times
 import cnl_plot
 import plot_ticks
 
@@ -107,9 +107,18 @@ def plot_net(ax, cnl_file, args):
 
 
 
-def plot(subplot_args, common_base_time=0):
-    fig, ax = plt.subplots()
+def plot(subplot_args, base_times=0):
+    """
+    [base_times] can either be a single nummer,
+        this is treated as common base time for all subplots
+        or a list
+        with the individual base times (same order as args.files)
 
+    """
+
+    fig, ax = plt.subplots()
+    i=0
+    current_base_time = base_times   # makes sense if a common base_time is used
 
     for args in subplot_args:
 
@@ -120,13 +129,18 @@ def plot(subplot_args, common_base_time=0):
         for filename in args.files:
             cnl_file = cnl_plot.parse_cnl_file(filename, nic_fields, nics)
 
+            # if individual base_times are used, get the next one
+            if isinstance(base_times, list):
+                current_base_time = base_times[i]
+                i += 1
+
             ## show some output
             print( filename )
             #print( pretty_json(cnl_file.get_general_header()) )
             #print()
 
             prepare_x_values(cnl_file)
-            cnl_file.x_values = [ x - common_base_time for x in cnl_file.x_values ]
+            cnl_file.x_values = [ x - current_base_time for x in cnl_file.x_values ]
 
 
             ## * Plot *
@@ -258,6 +272,9 @@ if __name__ == "__main__":
 
         parser.add_argument("-d", "--output-dir")
 
+        parser.add_argument("--rel-base-time", action="store_true",
+                            help="Do NOT use a common base time, but begin every line at 0. (Do not in conjunction with --reference-files)")
+
 
 
         ## make it pretty
@@ -310,20 +327,27 @@ if __name__ == "__main__":
 
 
     ## Find common base time
-    reference = list()
-    reference.extend(args.reference_files)
-    for args in subplot_args:
-        reference.extend(args.files)
+    if ( not args.rel_base_time ):
+        reference = list()
+        reference.extend(args.reference_files)
+        for args in subplot_args:
+            reference.extend(args.files)
 
-    common_base_time = get_common_base_time(reference)
+        base_time = get_common_base_time(reference)
 
+    ## Rel base time, find a base-time for each plot
+    else:
+        reference = list()
+#        reference.extend(args.reference_files)
+        for args in subplot_args:
+            reference.extend(args.files)
 
-
+        base_time = get_base_times(reference)
 
 
 
     ### Plotting
 
-    plot(subplot_args, common_base_time)
+    plot(subplot_args, base_time)
 
 
