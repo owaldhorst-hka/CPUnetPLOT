@@ -1,0 +1,13 @@
+## Copy this file to your working directory and adjust for your needs.
+# More info: http://matplotlib.org/users/customizing.html
+
+backend      : qt4agg
+pdf.fonttype       : 42         # Output Type 3 (Type3) or Type 42 (TrueType)
+
+axes.labelsize : 24
+legend.fontsize : 20
+xtick.labelsize : 16
+ytick.labelsize : 16
+
+figure.autolayout : True
+
