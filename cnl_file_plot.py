@@ -82,8 +82,34 @@ def plot_net(ax, cnl_file, args):
     ax.set_ylabel('Throughput (Bit/s)')
     ax.set_xlabel('Time (s)')
 
-    cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
+
+    ## * plot regular *
+    if ( not args.sum_only ):
+        # * plot regular *
+        cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
                   color=args.color, ema_only=True if smooth else False, smooth=smooth)
+
+    # * plot summarized *
+    if ( args.sum or args.sum_only ):
+        # summarize
+        sum = None
+        for col_name in cnl_file.net_col_names:
+            print( col_name )
+
+            if not sum:
+                sum = cnl_file.cols[col_name]
+            else:
+                sum = [ x+y for x,y in zip(sum, cnl_file.cols[col_name]) ]
+
+        # (just to be compatible with cnl_plot.plot)
+        aux_col_dict = dict()
+        aux_col_dict["sum"] = sum
+
+        # * plot *
+        cnl_plot.plot(ax, cnl_file.x_values, aux_col_dict, ["sum"], ["Total"], alpha,
+            color=args.color, ema_only=True if smooth else False, smooth=smooth)
+
+
 
     # Legend
     if ( args.legend_pos != None ):
@@ -225,7 +251,7 @@ if __name__ == "__main__":
 
     DEFAULT_OPACITY = 0.7
     DEFAULT_ALPHA = 0.1             # alpha for ema, the smaller the smoother
-    DEFAULT_Y_RANGE = 1  # Gbit/s
+    DEFAULT_Y_RANGE = 10  # Gbit/s
     DEFAULT_X_MIN = -5.0
     DEFAULT_X_MAX = None
 
@@ -275,6 +301,12 @@ if __name__ == "__main__":
         parser.add_argument("--rel-base-time", action="store_true",
                             help="Do NOT use a common base time, but begin every line at 0. (Do not in conjunction with --reference-files)")
 
+
+        parser.add_argument("--sum", action="store_true", default=False,
+                            help="Summarizes the values of the given streams (show total throughput as one line). Please make sure to select the connect NICs and send/receive direction.")
+
+        parser.add_argument("--sum-only", action="store_true", default=False,
+                            help="Hide individual lines (use together with --sum.")
 
 
         ## make it pretty
