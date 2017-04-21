@@ -82,13 +82,6 @@ def plot_net(ax, cnl_file, args):
     ax.set_ylabel('Throughput (Bit/s)')
     ax.set_xlabel('Time (s)')
 
-
-    ## * plot regular *
-    if ( not args.sum_only ):
-        # * plot regular *
-        cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
-                  color=args.color, ema_only=True if smooth else False, smooth=smooth)
-
     # * plot summarized *
     if ( args.sum or args.sum_only ):
         # summarize
@@ -107,7 +100,14 @@ def plot_net(ax, cnl_file, args):
 
         # * plot *
         cnl_plot.plot(ax, cnl_file.x_values, aux_col_dict, ["sum"], ["Total"], alpha,
-            color=args.color, ema_only=True if smooth else False, smooth=smooth)
+            color=args.sum_color, ema_only=True if smooth else False, smooth=smooth)
+
+
+    ## * plot regular *
+    if ( not args.sum_only ):
+        # * plot regular *
+        cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
+                  color=args.color, ema_only=True if smooth else False, smooth=smooth)
 
 
 
@@ -274,6 +274,10 @@ if __name__ == "__main__":
         parser.add_argument("-c", "--color", type=str, nargs='*',
                             help="see: http://matplotlib.org/api/colors_api.html")
 
+        parser.add_argument("-sc", "--sum-color", type=str, default="#d400ae",
+                            help="Color for summarized line, use together with --sum")
+
+
 
     ## These arguments can't be given within "--subplots"
     def add_unique_args(parser):
@@ -331,6 +335,7 @@ if __name__ == "__main__":
 
     ## adjust arguments
     args.net_scale *= 10**9  # --> multiply by 10**9 to get Gbit/s
+    args.sum_color = [args.sum_color]
 
 
     ## Subplots: Read the arguments given as argument to "--subplots" and merge the result
