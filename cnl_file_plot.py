@@ -105,8 +105,16 @@ def plot_net(ax, cnl_file, args):
 
     ## * plot regular *
     if ( not args.sum_only ):
+        # Change order of the lines that will be plotted
+        if ( args.reorder_plots ):
+            cols = [ cnl_file.net_col_names[int(index)-1] for index in args.reorder_plots ]
+            col_labels = [ cnl_file.net_col_labels[int(index)-1] for index in args.reorder_plots ]
+        else:
+            cols = cnl_file.net_col_names
+            col_labels = cnl_file.net_col_labels
+
         # * plot regular *
-        cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cnl_file.net_col_names, cnl_file.net_col_labels, alpha,
+        cnl_plot.plot(ax, cnl_file.x_values, cnl_file.cols, cols, col_labels, alpha,
                   color=args.color, ema_only=True if smooth else False, smooth=smooth)
 
 
@@ -270,6 +278,7 @@ if __name__ == "__main__":
         parser.add_argument("-r", "--receive-only", action="store_true")
         parser.add_argument("--nics", nargs='*')
         parser.add_argument("-nl", "--nic-labels", nargs='*')
+        parser.add_argument("--reorder-plots", nargs='*')
 
         parser.add_argument("-c", "--color", type=str, nargs='*',
                             help="see: http://matplotlib.org/api/colors_api.html")
