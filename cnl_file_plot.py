@@ -123,7 +123,7 @@ def plot_net(ax, cnl_file, args):
                         #fontsize=layout.fontsize.legend
                         )
         else:
-            l = ax.legend(loc=args.legend_pos)
+            l = ax.legend(loc=args.legend_pos, ncol=args.legend_col_number)
 
 
     ax.set_xlim(xmin=args.x_min)
@@ -318,6 +318,9 @@ if __name__ == "__main__":
         parser.add_argument("--x-max", type=float, default=DEFAULT_X_MAX)
 
         parser.add_argument("-l", "--legend-pos", type=int,
+                            help="see: http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.legend")
+
+        parser.add_argument("-ncols", "--legend-col-number", type=int, default=1,
                             help="see: http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.legend")
 
 
