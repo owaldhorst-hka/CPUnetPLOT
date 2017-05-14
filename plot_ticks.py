@@ -156,5 +156,7 @@ def format_yticks(y, pos=None):
         return "{:.0f}K ".format(float(y) / 1000)
     elif 1000000 <= y < 1000000000:
         return "{:.0f}M ".format(float(y) / 1000000)
+    elif 1000 < int(y/1000000) < 2000:
+        return "{:.1f}G ".format(float(y) / 1000000000)
     else:
         return "{:.0f}G ".format(float(y) / 1000000000)
