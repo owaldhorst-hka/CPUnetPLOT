@@ -77,7 +77,7 @@ def plot_net(ax, cnl_file, args):
     smooth = args.smooth_net
 
     # axes
-    ax.set_ylim(top=args.net_scale)
+    ax.set_ylim(args.y_min, args.net_scale)
     #ax.set_ylabel('Throughput (Bit/s)', fontsize=layout.fontsize.axis_labels)  ## TODO make fontsize choosable
     ax.set_ylabel('Throughput (Bit/s)')
     ax.set_xlabel('Time (s)')
@@ -295,6 +295,8 @@ if __name__ == "__main__":
 
         parser.add_argument("-nsc", "--net-scale", type=float, default=DEFAULT_Y_RANGE,
                             help="[Gbit/s]; Default: 10")
+        parser.add_argument("--y-min", type=float, default=0.0,
+                            help="[Gbit/s]; Default: 0")
         parser.add_argument("--opacity", type=float, default=DEFAULT_OPACITY,
                             help="Default: 0.7")
         parser.add_argument("-tn", "--transparent-net", action="store_true")
@@ -347,6 +349,7 @@ if __name__ == "__main__":
 
     ## adjust arguments
     args.net_scale *= 10**9  # --> multiply by 10**9 to get Gbit/s
+    args.y_min *= 10**9  # --> multiply by 10**9 to get Gbit/s
     args.sum_color = [args.sum_color]
 
 
