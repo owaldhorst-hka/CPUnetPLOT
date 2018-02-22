@@ -104,7 +104,7 @@ def plot_area_chart(ax, cnl_file, args, layout, cols, legend_outside, legend_tit
 
 
         # fill (seems to be the best option)
-        ax.fill(cnl_file.x_values, values,
+        ax.fill_between(cnl_file.x_values, values, 0,
                color=CPU_COLORS[field], label=field, zorder=z)
 
 
