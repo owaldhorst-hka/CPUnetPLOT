@@ -268,7 +268,7 @@ class CNLParser:
         if comment == None:
             comment = ""
             
-        return self.header["General"]["Comment"]
+        return comment
 
     def get_cpus(self):
         return self.header["ClassDefinitions"]["CPU"]["Siblings"]
