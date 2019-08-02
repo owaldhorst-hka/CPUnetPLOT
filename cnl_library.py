@@ -155,7 +155,15 @@ class CNLParser:
         if ( os.path.isdir(self.filename) ):
             raise self.WrongFileFormat_Exception()
 
-        with open( self.filename ) as in_file:
+        ## automatically handle compressed files
+        if self.filename.endswith(".bz2"):
+            import bz2
+            self.open_func = bz2.open
+        else:
+            self.open_func = open
+
+
+        with self.open_func( self.filename, mode="tr", encoding="UTF-8" ) as in_file:
             try:
                 ## Check file format version.
                 if ( not in_file.readline() == "%% CPUnetLOGv1\n" ):
@@ -188,7 +196,7 @@ class CNLParser:
 
 
         ## Read from file.
-        with open( self.filename ) as in_file:
+        with self.open_func( self.filename, mode="tr", encoding="UTF-8" ) as in_file:
             ## Find start of the CSV part.
             csv_reader = csv.reader( cnl_slice(in_file, "%% Begin_Body", "%% End_Body"), skipinitialspace=True )
             csv_header = next(csv_reader)
