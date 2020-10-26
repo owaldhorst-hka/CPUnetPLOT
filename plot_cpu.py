@@ -142,7 +142,7 @@ def plot_area_chart(ax, cnl_file, args, layout, cols, legend_outside, legend_tit
     else:
         l = ax.legend(loc=0)
 
-    l.draggable(True)
+    # l.draggable(True)
 
 
 def plot_top_cpus(cnl_file, args, layout, axes, indices=[0]):
