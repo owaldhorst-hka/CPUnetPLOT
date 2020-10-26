@@ -189,7 +189,7 @@ def plot_cpu(ax, cnl_file, args, layout):
     else:
         l = ax.legend(loc=0)
 
-    l.draggable(True)
+    # l.draggable(True)
 
 
 
