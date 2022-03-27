@@ -13,7 +13,7 @@
 import sys
 import matplotlib
 
-matplotlib.use('QT4Agg')  # override matplotlibrc (optional)
+#matplotlib.use('QT4Agg')  # override matplotlibrc (optional)
 import matplotlib.pyplot as plt
 
 from cnl_library import CNLParser, calc_ema, merge_lists, pretty_json, get_common_base_time
@@ -397,7 +397,7 @@ if __name__ == "__main__":
         ax2 = fig.add_subplot(2, num_cols, 4, sharex=ax_net, sharey=old_ax_cpu)
         layout.set_tick_fontsize(plt, ax1, ax2)
 
-        plot_top_cpus( cnl_file, args, layout, (ax1, ax2), (0,1) )
+        plot_top_cpus( cnl_file, args, layout, (ax1, ax2), [0] )
 
 
     ## Set window margins
