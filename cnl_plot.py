@@ -305,7 +305,7 @@ if __name__ == "__main__":
 
     ## Create figure (window/file)
     fig = plt.figure()
-    fig.canvas.set_window_title('CPUnetPlot')
+    fig.canvas.manager.set_window_title('CPUnetPlot')
 
 
     common_base_time = get_common_base_time(args.files)
