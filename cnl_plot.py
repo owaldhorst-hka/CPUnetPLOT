@@ -303,15 +303,14 @@ if __name__ == "__main__":
     num_files = len(args.files)
     name_suggestor = NameSuggestor()
 
+    num_cols = 2
+
     ## Create figure (window/file)
-    fig = plt.figure()
-    fig.canvas.set_window_title('CPUnetPlot')
+    fig = plt.figure(layout='constrained',figsize= (8*num_cols, 5*(num_files+1)))
+    fig.canvas.manager.set_window_title('CPUnetPlot')
 
 
     common_base_time = get_common_base_time(args.files)
-
-
-    num_cols = 2
 
     min_x = None
     max_x = None
