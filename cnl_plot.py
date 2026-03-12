@@ -275,7 +275,7 @@ if __name__ == "__main__":
 
 
     args.net_scale *= 10**9  # --> multiply by 10**9 to get Gbit/s
-	
+
     ## set implicated options
     # --transparent
     if ( args.transparent ):
@@ -359,14 +359,13 @@ if __name__ == "__main__":
             fig.texts.append(t)
 
 
-        ## Prepare subplots
-        ax_net = fig.add_subplot(2, num_cols, i+1, sharex=old_ax_net, sharey=old_ax_net)
-        ax_cpu = fig.add_subplot(2, num_cols, i+num_cols+1, sharex=ax_net, sharey=old_ax_cpu)
+        ## Prepare subplot
+        ax_net = fig.add_subplot(1, 1, 1)
         #ax_net = fig.add_subplot(111)  ## twin axis
         #ax_cpu = ax_net.twinx()        ## twin axis
 
         # set tick size
-        layout.set_tick_fontsize(plt, ax_net, ax_cpu)
+        layout.set_tick_fontsize(plt, ax_net)
 
 
 
@@ -384,19 +383,8 @@ if __name__ == "__main__":
 
         ## Plot
         plot_net(ax_net, cnl_file, args, layout)
-        plot_cpu(ax_cpu, cnl_file, args, layout)
 
         old_ax_net = ax_net
-        old_ax_cpu = ax_cpu
-
-
-    ## If we have only one input file, plot CPU area charts.
-    if ( num_files == 1 ):
-        ax1 = fig.add_subplot(2, num_cols, 2, sharex=old_ax_net, sharey=old_ax_cpu)
-        ax2 = fig.add_subplot(2, num_cols, 4, sharex=ax_net, sharey=old_ax_cpu)
-        layout.set_tick_fontsize(plt, ax1, ax2)
-
-        plot_top_cpus( cnl_file, args, layout, (ax1, ax2), [0] )
 
 
     ## Set window margins
